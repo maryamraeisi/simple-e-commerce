@@ -1,6 +1,6 @@
-package com.example.ecommerce.product;
+package com.example.product;
 
-import com.example.ecommerce.product.dto.ProductResponse;
+import com.example.product.dto.ProductResponse;
 
 public class ProductMapper {
 

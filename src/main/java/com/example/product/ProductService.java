@@ -1,10 +1,10 @@
-package com.example.ecommerce.product;
+package com.example.product;
 
-import com.example.ecommerce.product.dto.CreateProductRequest;
-import com.example.ecommerce.product.dto.ProductResponse;
-import com.example.ecommerce.product.dto.UpdateProductRequest;
-import com.example.ecommerce.product.dto.*;
-import com.example.ecommerce.product.exception.ProductNotFoundException;
+import com.example.product.dto.CreateProductRequest;
+import com.example.product.dto.ProductResponse;
+import com.example.product.dto.UpdateProductRequest;
+import com.example.product.dto.*;
+import com.example.product.exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;

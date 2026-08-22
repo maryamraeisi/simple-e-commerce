@@ -1,4 +1,4 @@
-package com.example.ecommerce.product;
+package com.example.product;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
