@@ -13,8 +13,8 @@ public class NotificationService {
 
     private final EmailService emailService;
 
-    public void sendOrderConfirmation(Long customerId, String email, Long orderId) {
-        String subject = "Order Confirmation";
+    public void sendOrderCreatedNotification(Long customerId, String email, Long orderId) {
+        String subject = "Order Created";
 
         String message = "Thank you for your order #" + orderId;
 
