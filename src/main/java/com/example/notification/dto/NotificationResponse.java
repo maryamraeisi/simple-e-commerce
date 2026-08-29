@@ -1,7 +1,7 @@
 package com.example.notification.dto;
 
-import com.example.notification.NotificationStatus;
-import com.example.notification.NotificationType;
+import com.example.notification.enums.NotificationStatus;
+import com.example.notification.enums.NotificationType;
 
 import java.time.LocalDateTime;
 

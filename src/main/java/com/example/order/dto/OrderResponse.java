@@ -1,6 +1,6 @@
 package com.example.order.dto;
 
-import com.example.order.OrderStatus;
+import com.example.order.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
