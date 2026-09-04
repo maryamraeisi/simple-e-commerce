@@ -3,6 +3,7 @@ package com.example.inventory.service;
 import com.example.inventory.dto.CreateInventoryRequest;
 import com.example.inventory.dto.InventoryResponse;
 import com.example.inventory.entity.Inventory;
+import com.example.inventory.mapper.InventoryMapper;
 import com.example.inventory.repository.InventoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class InventoryService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        return toResponse(inventoryRepository.save(inventory));
+        return InventoryMapper.toResponse(inventoryRepository.save(inventory));
     }
 
     public InventoryResponse addStock(Long productId, Integer quantity) {
@@ -40,7 +41,7 @@ public class InventoryService {
         inventory.setQuantity(inventory.getQuantity() + quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        return toResponse(inventoryRepository.save(inventory));
+        return InventoryMapper.toResponse(inventoryRepository.save(inventory));
     }
 
     public InventoryResponse reserveStock(Long productId, Integer quantity) {
@@ -55,7 +56,7 @@ public class InventoryService {
         inventory.setReservedQuantity(inventory.getReservedQuantity() + quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        return toResponse(inventoryRepository.save(inventory));
+        return InventoryMapper.toResponse(inventoryRepository.save(inventory));
     }
 
     public InventoryResponse releaseStock(Long productId, Integer quantity) {
@@ -68,20 +69,11 @@ public class InventoryService {
         inventory.setReservedQuantity(inventory.getReservedQuantity() - quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        return toResponse(inventoryRepository.save(inventory));
+        return InventoryMapper.toResponse(inventoryRepository.save(inventory));
     }
 
     private Inventory getInventory(Long productId) {
         return inventoryRepository.findByProductId(productId).orElseThrow(() ->
                         new IllegalArgumentException("Inventory not found for product: " + productId));
-    }
-
-    private InventoryResponse toResponse(Inventory inventory) {
-        return new InventoryResponse(
-                inventory.getId(),
-                inventory.getProductId(),
-                inventory.getQuantity(),
-                inventory.getReservedQuantity()
-        );
     }
 }

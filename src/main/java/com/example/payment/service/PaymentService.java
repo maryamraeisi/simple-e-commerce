@@ -1,13 +1,18 @@
 package com.example.payment.service;
 
+import com.example.infrastructure.messaging.config.RabbitMQConfig;
+import com.example.infrastructure.messaging.constants.RabbitMQExchange;
+import com.example.infrastructure.messaging.constants.RabbitMQRoutingKey;
 import com.example.payment.dto.CreatePaymentRequest;
 import com.example.payment.dto.PaymentResponse;
 import com.example.payment.entity.Payment;
 import com.example.payment.enums.PaymentStatus;
+import com.example.payment.event.PaymentCreatedEvent;
 import com.example.payment.mapper.PaymentMapper;
 import com.example.payment.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +23,8 @@ import java.time.LocalDateTime;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+
+    private final RabbitTemplate rabbitTemplate;
 
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         Payment payment = Payment.builder()
@@ -30,6 +37,8 @@ public class PaymentService {
 
         Payment saved = paymentRepository.save(payment);
 
+        sendPaymentCreatedNotification(payment);
+
         return PaymentMapper.toResponse(saved);
     }
 
@@ -40,7 +49,17 @@ public class PaymentService {
         payment.setStatus(PaymentStatus.COMPLETED);
         payment.setUpdatedAt(LocalDateTime.now());
 
-        return PaymentMapper.toResponse(paymentRepository.save(payment));
+        Payment updated = paymentRepository.save(payment);
+
+        return PaymentMapper.toResponse(updated);
+    }
+
+    private void sendPaymentCreatedNotification(Payment payment) {
+        PaymentCreatedEvent event = new PaymentCreatedEvent(payment.getId(),
+                payment.getOrderId(),
+                payment.getAmount());
+
+        rabbitTemplate.convertAndSend(RabbitMQExchange.EXCHANGE, RabbitMQRoutingKey.PAYMENT_CREATED, event);
     }
 
 }

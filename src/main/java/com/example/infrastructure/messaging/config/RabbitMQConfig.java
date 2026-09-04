@@ -1,11 +1,12 @@
 package com.example.infrastructure.messaging.config;
 
+import com.example.infrastructure.messaging.constants.RabbitMQExchange;
+import com.example.infrastructure.messaging.constants.RabbitMQQueue;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -16,55 +17,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    // Main exchange
-    public static final String EXCHANGE = "ecommerce.exchange";
-
-    // Routing keys
-    public static final String ORDER_CREATED = "order.created";
-
-    // Notification queue
-    public static final String NOTIFICATION_QUEUE = "notification.queue";
-
-    // Dead Letter Exchange
-    public static final String DLX = "notification.dlx";
-
-    // Dead Letter Queue
-    public static final String DLQ = "notification.dlq";
-
-
-    // =========================
-    // Main Exchange
-    // =========================
-
     @Bean
-    public DirectExchange ecommerceExchange() {
-        return new DirectExchange(EXCHANGE);
+    public TopicExchange ecommerceExchange() {
+        return new TopicExchange(RabbitMQExchange.EXCHANGE);
     }
 
-
     // =========================
-    // Notification Queue
+    // Inventory Queue
     // =========================
 
     @Bean
-    public Queue notificationQueue() {
+    public Queue inventoryQueue() {
         return QueueBuilder
-                .durable(NOTIFICATION_QUEUE)
-                .deadLetterExchange(DLX)
+                .durable(RabbitMQQueue.INVENTORY_QUEUE)
+                .deadLetterExchange(RabbitMQExchange.DEAD_LETTER)
                 .build();
-    }
-
-
-    // =========================
-    // Notification Binding
-    // =========================
-
-    @Bean
-    public Binding notificationBinding(Queue notificationQueue, DirectExchange ecommerceExchange) {
-        return BindingBuilder
-                .bind(notificationQueue)
-                .to(ecommerceExchange)
-                .with(ORDER_CREATED);
     }
 
 
@@ -74,32 +41,8 @@ public class RabbitMQConfig {
 
     @Bean
     public DirectExchange deadLetterExchange() {
-        return new DirectExchange(DLX);
+        return new DirectExchange(RabbitMQExchange.DEAD_LETTER);
     }
-
-
-    // =========================
-    // Dead Letter Queue
-    // =========================
-
-    @Bean
-    public Queue deadLetterQueue() {
-        return QueueBuilder.durable(DLQ).build();
-    }
-
-
-    // =========================
-    // DLQ Binding
-    // =========================
-
-    @Bean
-    public Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
-        return BindingBuilder
-                .bind(deadLetterQueue)
-                .to(deadLetterExchange)
-                .with(NOTIFICATION_QUEUE);
-    }
-
 
     // =========================
     // JSON Message Converter

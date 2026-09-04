@@ -3,6 +3,8 @@ package com.example.order.service;
 import com.example.customer.entity.Customer;
 import com.example.customer.repository.CustomerRepository;
 import com.example.infrastructure.messaging.config.RabbitMQConfig;
+import com.example.infrastructure.messaging.constants.RabbitMQExchange;
+import com.example.infrastructure.messaging.constants.RabbitMQRoutingKey;
 import com.example.order.event.OrderCreatedEvent;
 import com.example.order.mapper.OrderMapper;
 import com.example.order.repository.OrderRepository;
@@ -112,8 +114,8 @@ public class OrderService {
                 customer.getEmail(), order.getTotalPrice());
 
         rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                RabbitMQConfig.ORDER_CREATED,
+                RabbitMQExchange.EXCHANGE,
+                RabbitMQRoutingKey.ORDER_CREATED,
                 event
         );
     }
