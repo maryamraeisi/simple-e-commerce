@@ -1,11 +1,8 @@
 package com.example.infrastructure.messaging.config;
 
 import com.example.infrastructure.messaging.constants.RabbitMQExchange;
-import com.example.infrastructure.messaging.constants.RabbitMQQueue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -21,19 +18,6 @@ public class RabbitMQConfig {
     public TopicExchange ecommerceExchange() {
         return new TopicExchange(RabbitMQExchange.EXCHANGE);
     }
-
-    // =========================
-    // Inventory Queue
-    // =========================
-
-    @Bean
-    public Queue inventoryQueue() {
-        return QueueBuilder
-                .durable(RabbitMQQueue.INVENTORY_QUEUE)
-                .deadLetterExchange(RabbitMQExchange.DEAD_LETTER)
-                .build();
-    }
-
 
     // =========================
     // Dead Letter Exchange

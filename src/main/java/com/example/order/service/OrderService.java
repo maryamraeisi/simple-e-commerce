@@ -56,6 +56,10 @@ public class OrderService {
         return orderRepository.findById(id).map(OrderMapper::toResponse).orElseThrow();
     }
 
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id).orElseThrow();
+    }
+
     public List<OrderResponse> getAllOrders() {
         return orderRepository
                 .findAll()
@@ -69,6 +73,12 @@ public class OrderService {
 
         order.setStatus(OrderStatus.CANCELLED);
 
+        orderRepository.save(order);
+    }
+
+    public void updateOrderStatus(Long orderId, OrderStatus orderStatus) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        order.setStatus(orderStatus);
         orderRepository.save(order);
     }
 
@@ -119,4 +129,5 @@ public class OrderService {
                 event
         );
     }
+
 }

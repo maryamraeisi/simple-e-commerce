@@ -1,4 +1,7 @@
 package com.example.payment.event;
 
-public record PaymentCompletedEvent() {
+public record PaymentCompletedEvent(
+        Long orderId
+) {
+
 }

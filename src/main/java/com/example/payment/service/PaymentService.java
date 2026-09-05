@@ -1,12 +1,14 @@
 package com.example.payment.service;
 
-import com.example.infrastructure.messaging.config.RabbitMQConfig;
 import com.example.infrastructure.messaging.constants.RabbitMQExchange;
 import com.example.infrastructure.messaging.constants.RabbitMQRoutingKey;
+import com.example.order.enums.OrderStatus;
+import com.example.order.service.OrderService;
 import com.example.payment.dto.CreatePaymentRequest;
 import com.example.payment.dto.PaymentResponse;
 import com.example.payment.entity.Payment;
 import com.example.payment.enums.PaymentStatus;
+import com.example.payment.event.PaymentCompletedEvent;
 import com.example.payment.event.PaymentCreatedEvent;
 import com.example.payment.mapper.PaymentMapper;
 import com.example.payment.repository.PaymentRepository;
@@ -23,8 +25,8 @@ import java.time.LocalDateTime;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-
     private final RabbitTemplate rabbitTemplate;
+    private final OrderService orderService;
 
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         Payment payment = Payment.builder()
@@ -37,12 +39,12 @@ public class PaymentService {
 
         Payment saved = paymentRepository.save(payment);
 
-        sendPaymentCreatedNotification(payment);
+        sendPaymentCreatedEvent(payment);
 
         return PaymentMapper.toResponse(saved);
     }
 
-    public PaymentResponse processPayment(Long paymentId) {
+    public PaymentResponse completePayment(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
 
@@ -51,10 +53,19 @@ public class PaymentService {
 
         Payment updated = paymentRepository.save(payment);
 
+        orderService.updateOrderStatus(payment.getOrderId(), OrderStatus.PAID);
+
+        sendPaymentCompletedEvent(payment);
+
         return PaymentMapper.toResponse(updated);
     }
 
-    private void sendPaymentCreatedNotification(Payment payment) {
+    private void sendPaymentCompletedEvent(Payment payment) {
+        PaymentCompletedEvent event = new PaymentCompletedEvent(payment.getOrderId());
+        rabbitTemplate.convertAndSend(RabbitMQExchange.EXCHANGE, RabbitMQRoutingKey.PAYMENT_COMPLETED, event);
+    }
+
+    private void sendPaymentCreatedEvent(Payment payment) {
         PaymentCreatedEvent event = new PaymentCreatedEvent(payment.getId(),
                 payment.getOrderId(),
                 payment.getAmount());

@@ -6,7 +6,9 @@ public final class RabbitMQQueue {
 
     public static final String NOTIFICATION_QUEUE = "notification.queue";
 
-    public static final String INVENTORY_QUEUE = "inventory.queue";
+    public static final String INVENTORY_RESERVE = "inventory.reserve";
+    public static final String INVENTORY_RELEASE = "inventory.release";
+    public static final String INVENTORY_CONFIRM = "inventory.confirm";
 
 
     public static final String NOTIFICATION_DLQ = "notification.dlq";

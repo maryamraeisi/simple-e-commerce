@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/inventory")
 @RequiredArgsConstructor
@@ -26,11 +28,10 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.addStock(productId, request.quantity()));
     }
 
-    @PostMapping("/{productId}/reserve")
-    public ResponseEntity<InventoryResponse> reserve(@PathVariable Long productId,
-                                                     @RequestBody UpdateStockRequest request) {
+    @PostMapping("/{orderId}/reserve")
+    public ResponseEntity<List<InventoryResponse>> reserve(@PathVariable Long orderId) {
 
-        return ResponseEntity.ok(inventoryService.reserveStock(productId, request.quantity()));
+        return ResponseEntity.ok(inventoryService.reserveStock(orderId));
     }
 
     @PostMapping("/{productId}/release")
