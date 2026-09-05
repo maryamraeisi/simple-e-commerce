@@ -83,17 +83,35 @@ public class InventoryService {
         return inventory;
     }
 
-    public InventoryResponse releaseStock(Long productId, Integer quantity) {
+    public List<InventoryResponse> releaseStock(Long orderId) {
+        Order order = orderService.getOrderById(orderId);
+
+        List<InventoryResponse> inventoryResponses = new LinkedList<>();
+
+        for (OrderItem item : order.getItems()) {
+            Inventory updated = releaseOrderItems(item);
+            inventoryResponses.add(InventoryMapper.toResponse(updated));
+        }
+        return inventoryResponses;
+    }
+
+    private Inventory releaseOrderItems(OrderItem item) {
+        Long productId = item.getProductId();
+        Integer quantity = item.getQuantity();
+
         Inventory inventory = getInventory(productId);
 
         if (inventory.getReservedQuantity() < quantity) {
             throw new IllegalStateException("Cannot release more stock than reserved");
         }
 
+        inventory.setQuantity(inventory.getQuantity() + quantity);
         inventory.setReservedQuantity(inventory.getReservedQuantity() - quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        return InventoryMapper.toResponse(inventoryRepository.save(inventory));
+        inventoryRepository.save(inventory);
+
+        return inventory;
     }
 
     private Inventory getInventory(Long productId) {

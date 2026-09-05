@@ -19,8 +19,13 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.createPayment(request));
     }
 
-    @PostMapping("/{id}/process")
-    public ResponseEntity<PaymentResponse> processPayment(@PathVariable Long id) {
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<PaymentResponse> completePayment(@PathVariable Long id) {
         return ResponseEntity.ok(paymentService.completePayment(id));
+    }
+
+    @PostMapping("/{id}/fail")
+    public ResponseEntity<PaymentResponse> failPayment(@PathVariable Long id) {
+        return ResponseEntity.ok(paymentService.failPayment(id));
     }
 }

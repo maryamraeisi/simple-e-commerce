@@ -34,9 +34,8 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.reserveStock(orderId));
     }
 
-    @PostMapping("/{productId}/release")
-    public ResponseEntity<InventoryResponse> release(@PathVariable Long productId,
-                                                     @RequestBody UpdateStockRequest request) {
-        return ResponseEntity.ok(inventoryService.releaseStock(productId, request.quantity()));
+    @PostMapping("/{orderId}/release")
+    public ResponseEntity<List<InventoryResponse>> release(@PathVariable Long orderId) {
+        return ResponseEntity.ok(inventoryService.releaseStock(orderId));
     }
 }

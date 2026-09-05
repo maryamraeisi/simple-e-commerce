@@ -10,6 +10,7 @@ import com.example.payment.entity.Payment;
 import com.example.payment.enums.PaymentStatus;
 import com.example.payment.event.PaymentCompletedEvent;
 import com.example.payment.event.PaymentCreatedEvent;
+import com.example.payment.event.PaymentFailedEvent;
 import com.example.payment.mapper.PaymentMapper;
 import com.example.payment.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
@@ -58,6 +59,28 @@ public class PaymentService {
         sendPaymentCompletedEvent(payment);
 
         return PaymentMapper.toResponse(updated);
+    }
+
+    public PaymentResponse failPayment(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
+
+        payment.setStatus(PaymentStatus.FAILED);
+        payment.setUpdatedAt(LocalDateTime.now());
+
+        Payment updated = paymentRepository.save(payment);
+
+        sendPaymentFailedEvent(payment);
+
+        return PaymentMapper.toResponse(updated);
+    }
+
+    private void sendPaymentFailedEvent(Payment payment) {
+        PaymentFailedEvent event = new PaymentFailedEvent(payment.getId(),
+                payment.getOrderId(),
+                payment.getAmount());
+
+        rabbitTemplate.convertAndSend(RabbitMQExchange.EXCHANGE, RabbitMQRoutingKey.PAYMENT_FAILED, event);
     }
 
     private void sendPaymentCompletedEvent(Payment payment) {
