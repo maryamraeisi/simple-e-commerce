@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+        .container {
+            width: min(1100px, 92%);
+            margin: 40px auto;
+        }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        h1, h2, h3 { margin-top: 0; }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            background: #e5e7eb;
+            color: #111827;
+        }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn:disabled { opacity: .55; cursor: not-allowed; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: middle;
+        }
+        th { background: #f9fafb; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .field { margin-bottom: 16px; }
+        .row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .item-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .message {
+            display: none;
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+        }
+        .message.error { display: block; background: #fee2e2; color: #991b1b; }
+        .message.success { display: block; background: #dcfce7; color: #166534; }
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .muted { color: #6b7280; }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .summary-item {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 14px;
+        }
+        .summary-item span {
+            display: block;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        @media (max-width: 760px) {
+            .row, .summary-grid { grid-template-columns: 1fr; }
+            .item-row { grid-template-columns: 1fr; }
+            .topbar { align-items: flex-start; flex-direction: column; }
+            table { font-size: 13px; }
+        }
+    </style>
+
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <div>
+            <h1>Order Details</h1>
+            <div class="muted" id="subtitle">Loading order...</div>
+        </div>
+
+        <div class="actions">
+            <a class="btn btn-secondary" href="/orders/orders.html">Back to Orders</a>
+            <a class="btn" href="/index.html">Home</a>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div id="orderContent" style="display:none;">
+        <div class="card">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span>Order ID</span>
+                    <strong id="orderId"></strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Customer ID</span>
+                    <strong id="customerId"></strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Status</span>
+                    <strong id="status"></strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Total Price</span>
+                    <strong id="totalPrice"></strong>
+                </div>
+            </div>
+
+            <p>
+                <strong>Created At:</strong>
+                <span id="createdAt"></span>
+            </p>
+
+            <button id="cancelButton"
+                    class="btn btn-danger"
+                    onclick="cancelOrder()">
+                Cancel Order
+            </button>
+        </div>
+
+        <div class="card">
+            <h2>Items</h2>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                </tr>
+                </thead>
+                <tbody id="itemsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const orderIdFromUrl = params.get('id');
+
+    const message = document.getElementById('message');
+    const orderContent = document.getElementById('orderContent');
+    const cancelButton = document.getElementById('cancelButton');
+
+    function showError(text) {
+        message.className = 'message error';
+        message.textContent = text;
+    }
+
+    function formatMoney(value) {
+        if (value === null || value === undefined) return '-';
+        return Number(value).toFixed(2);
+    }
+
+    function formatDate(value) {
+        if (!value) return '-';
+        return new Date(value).toLocaleString();
+    }
+
+    async function loadOrder() {
+        if (!orderIdFromUrl) {
+            showError('Order ID is missing from the URL.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/orders/${orderIdFromUrl}`);
+
+            if (!response.ok) {
+                throw new Error(`Could not load order #${orderIdFromUrl}.`);
+            }
+
+            const order = await response.json();
+
+            document.getElementById('subtitle').textContent = `Order #${order.id}`;
+            document.getElementById('orderId').textContent = order.id;
+            document.getElementById('customerId').textContent = order.customerId ?? '-';
+            document.getElementById('status').textContent = order.status ?? '-';
+            document.getElementById('totalPrice').textContent = formatMoney(order.totalPrice);
+            document.getElementById('createdAt').textContent = formatDate(order.createdAt);
+
+            cancelButton.disabled = order.status === 'CANCELLED';
+
+            if (order.status === 'CANCELLED') {
+                cancelButton.textContent = 'Order Cancelled';
+            }
+
+            const itemsBody = document.getElementById('itemsBody');
+            itemsBody.innerHTML = '';
+
+            if (!order.items || order.items.length === 0) {
+                itemsBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="muted">This order has no items.</td>
+                    </tr>`;
+            } else {
+                order.items.forEach(item => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${item.productId ?? '-'}</td>
+                        <td>${item.productName ?? '-'}</td>
+                        <td>${item.quantity ?? '-'}</td>
+                        <td>${formatMoney(item.unitPrice)}</td>
+                        <td>${formatMoney(item.subtotal)}</td>
+                    `;
+
+                    itemsBody.appendChild(row);
+                });
+            }
+
+            orderContent.style.display = 'block';
+        } catch (error) {
+            showError(error.message);
+        }
+    }
+
+    async function cancelOrder() {
+        if (!confirm(`Cancel order #${orderIdFromUrl}?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/orders/${orderIdFromUrl}/cancel`, {
+                method: 'PATCH'
+            });
+
+            if (!response.ok) {
+                throw new Error('Could not cancel the order.');
+            }
+
+            await loadOrder();
+        } catch (error) {
+            showError(error.message);
+        }
+    }
+
+    loadOrder();
+</script>
+</body>
+</html>

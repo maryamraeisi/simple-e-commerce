@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Order</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+        .container {
+            width: min(1100px, 92%);
+            margin: 40px auto;
+        }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        h1, h2, h3 { margin-top: 0; }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            background: #e5e7eb;
+            color: #111827;
+        }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn:disabled { opacity: .55; cursor: not-allowed; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: middle;
+        }
+        th { background: #f9fafb; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .field { margin-bottom: 16px; }
+        .row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .item-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .message {
+            display: none;
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+        }
+        .message.error { display: block; background: #fee2e2; color: #991b1b; }
+        .message.success { display: block; background: #dcfce7; color: #166534; }
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .muted { color: #6b7280; }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .summary-item {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 14px;
+        }
+        .summary-item span {
+            display: block;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        @media (max-width: 760px) {
+            .row, .summary-grid { grid-template-columns: 1fr; }
+            .item-row { grid-template-columns: 1fr; }
+            .topbar { align-items: flex-start; flex-direction: column; }
+            table { font-size: 13px; }
+        }
+    </style>
+
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <div>
+            <h1>Create Order</h1>
+            <div class="muted">Create an order for a customer and add one or more products.</div>
+        </div>
+        <div class="actions">
+            <a class="btn btn-secondary" href="/orders/orders.html">Back to Orders</a>
+            <a class="btn" href="/index.html">Home</a>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <form id="orderForm" class="card">
+        <div class="field">
+            <label for="customerId">Customer ID</label>
+            <input id="customerId"
+                   type="number"
+                   min="1"
+                   required
+                   placeholder="Example: 1">
+        </div>
+
+        <h3>Order Items</h3>
+        <div id="itemsContainer"></div>
+
+        <div class="actions">
+            <button type="button" class="btn" onclick="addItemRow()">+ Add Item</button>
+            <button type="submit" class="btn btn-primary">Create Order</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('orderForm');
+    const itemsContainer = document.getElementById('itemsContainer');
+    const message = document.getElementById('message');
+
+    function showMessage(text, type) {
+        message.className = `message ${type}`;
+        message.textContent = text;
+    }
+
+    function addItemRow(productId = '', quantity = 1) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'item-row';
+
+        wrapper.innerHTML = `
+            <div>
+                <label>Product ID</label>
+                <input class="product-id"
+                       type="number"
+                       min="1"
+                       required
+                       value="${productId}"
+                       placeholder="Example: 10">
+            </div>
+
+            <div>
+                <label>Quantity</label>
+                <input class="quantity"
+                       type="number"
+                       min="1"
+                       required
+                       value="${quantity}">
+            </div>
+
+            <button type="button"
+                    class="btn btn-danger"
+                    onclick="removeItemRow(this)">
+                Remove
+            </button>
+        `;
+
+        itemsContainer.appendChild(wrapper);
+    }
+
+    function removeItemRow(button) {
+        const rows = document.querySelectorAll('.item-row');
+
+        if (rows.length === 1) {
+            showMessage('An order must contain at least one item.', 'error');
+            return;
+        }
+
+        button.closest('.item-row').remove();
+    }
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+
+        const customerId = Number(document.getElementById('customerId').value);
+
+        const items = [...document.querySelectorAll('.item-row')].map(row => ({
+            productId: Number(row.querySelector('.product-id').value),
+            quantity: Number(row.querySelector('.quantity').value)
+        }));
+
+        const request = {
+            customerId,
+            items
+        };
+
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(request)
+            });
+
+            if (!response.ok) {
+                const body = await response.text();
+                throw new Error(body || 'Could not create the order.');
+            }
+
+            const order = await response.json();
+
+            showMessage(`Order #${order.id} was created successfully.`, 'success');
+
+            window.location.href = `order-details.html`;
+        } catch (error) {
+            showMessage(error.message, 'error');
+        }
+    });
+
+    addItemRow();
+</script>
+</body>
+</html>
