@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customers</title>
+
+    <link rel="stylesheet" href="/customers/customer.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="page-header">
+        <div>
+            <h1>Customers</h1>
+            <p>Manage your customers</p>
+        </div>
+
+        <a href="/customers/customer-form.html" class="btn btn-primary">
+            + Add Customer
+        </a>
+    </div>
+
+    <div id="message"></div>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody id="customer-table-body">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script src="/customers/customers.js"></script>
+
+</body>
+</html>

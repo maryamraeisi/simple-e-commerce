@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer</title>
+
+    <link rel="stylesheet" href="/customers/customer.css">
+
+</head>
+
+<body>
+
+<div class="container form-container">
+
+    <div class="page-header">
+
+        <div>
+            <h1 id="form-title">
+                Add Customer
+            </h1>
+
+            <p id="form-description">
+                Create a new customer
+            </p>
+        </div>
+
+        <a href="/customers/customers.html" class="btn">
+            ← Back
+        </a>
+
+    </div>
+
+    <div id="message"></div>
+
+    <form id="customer-form">
+
+        <div class="form-group">
+
+            <label for="firstName">
+                First Name
+            </label>
+
+            <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    required>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="lastName">
+                Last Name
+            </label>
+
+            <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    required>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="email">
+                Email
+            </label>
+
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="phoneNumber">
+                Phone Number
+            </label>
+
+            <input
+                    type="tel"
+                    id="phoneNumber"
+                    name="phoneNumber">
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="submit-button">
+                Create Customer
+            </button>
+
+            <a
+                    href="/customers/customers.html"
+                    class="btn">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script src="/customers/customer-form.js"></script>
+
+</body>
+</html>
