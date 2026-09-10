@@ -24,8 +24,22 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final OrderService orderService;
 
-    public InventoryResponse createInventory(CreateInventoryRequest request) {
+    public InventoryResponse getByProductId(Long productId) {
+        Inventory inventory = getInventory(productId);
+        return InventoryMapper.toResponse(inventory, inventory.getProduct().getName());
+    }
 
+    public List<InventoryResponse> getAll() {
+        List<InventoryResponse> inventoryResponseList = new LinkedList<>();
+        List<Inventory> inventoryList = inventoryRepository.findAllWithProduct();
+        for (Inventory inventory : inventoryList) {
+            InventoryResponse inventoryResponse = InventoryMapper.toResponse(inventory, inventory.getProduct().getName());
+            inventoryResponseList.add(inventoryResponse);
+        }
+        return inventoryResponseList;
+    }
+
+    public InventoryResponse createInventory(CreateInventoryRequest request) {
         if (inventoryRepository.findByProductId(request.productId()).isPresent()) {
             throw new IllegalArgumentException("Inventory already exists for product: " + request.productId());
         }
@@ -37,12 +51,21 @@ public class InventoryService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+        Inventory saved = inventoryRepository.save(inventory);
 
-        return InventoryMapper.toResponse(inventoryRepository.save(inventory));
+        return InventoryMapper.toResponse(saved);
     }
 
     public InventoryResponse addStock(Long productId, Integer quantity) {
         Inventory inventory = getInventory(productId);
+
+        if (inventory == null) {
+            inventory = new Inventory();
+            inventory.setProductId(productId);
+            inventory.setQuantity(0);
+            inventory.setReservedQuantity(0);
+            inventory.setCreatedAt(LocalDateTime.now());
+        }
 
         inventory.setQuantity(inventory.getQuantity() + quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
@@ -115,8 +138,7 @@ public class InventoryService {
     }
 
     private Inventory getInventory(Long productId) {
-        return inventoryRepository.findByProductId(productId).orElseThrow(() ->
-                        new IllegalArgumentException("Inventory not found for product: " + productId));
+        return inventoryRepository.findByProductId(productId).orElse(null);
     }
 
     public void purchaseConfirmed(Long orderId) {
@@ -138,4 +160,5 @@ public class InventoryService {
 
         inventoryRepository.save(inventory);
     }
+
 }

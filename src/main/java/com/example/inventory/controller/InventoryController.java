@@ -17,6 +17,16 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
+    @GetMapping
+    public ResponseEntity<List<InventoryResponse>> getAll() {
+        return ResponseEntity.ok(inventoryService.getAll());
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<InventoryResponse> getByProductId(@PathVariable Long productId) {
+        return ResponseEntity.ok(inventoryService.getByProductId(productId));
+    }
+
     @PostMapping
     public ResponseEntity<InventoryResponse> create(@RequestBody CreateInventoryRequest request) {
         return ResponseEntity.ok(inventoryService.createInventory(request));

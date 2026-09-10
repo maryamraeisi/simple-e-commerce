@@ -36,7 +36,7 @@ function renderProduct(product) {
                 <img
                     src="${product.imageUrl || '/images/product-placeholder.png'}"
                     alt="${product.name}"
-<!--                    onerror="this.src='/images/product-placeholder.png'"-->
+                    onerror="this.src='/images/product-placeholder.png'"
                 >
             </div>
             

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Inventory</title>
+
+    <link rel="stylesheet" href="/common/common.css">
+    <link rel="stylesheet" href="/inventory/inventory.css">
+</head>
+
+<body>
+
+<header class="header">
+    <h1>Inventory</h1>
+    <p>Manage product stock and inventory operations</p>
+</header>
+
+<main class="container">
+
+    <!-- Page header -->
+    <div class="inventory-page-header">
+        <div class="page-title">
+            <h2>Inventory</h2>
+            <p>View and manage your product stock.</p>
+        </div>
+
+        <a href="/inventory/inventory-form.html"
+           class="btn btn-primary">
+            Create Inventory
+        </a>
+
+        <a href="/index.html" class="btn btn-secondary">← Back</a>
+    </div>
+
+
+    <!-- Message -->
+    <div id="message" class="message" style="display: none;"></div>
+
+
+    <!-- Inventory table -->
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>Total Quantity</th>
+                <th>Reserved</th>
+                <th>Available</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody id="inventoryTableBody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- Empty state -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <h3>No inventory found</h3>
+        <p>Create inventory for a product to get started.</p>
+
+        <a href="/inventory/inventory-form.html"
+           class="btn btn-primary">
+            Create Inventory
+        </a>
+    </div>
+
+
+    <!-- Add stock section -->
+    <section class="operation-section">
+
+        <div class="section-header">
+            <div>
+                <h2>Add Stock</h2>
+                <p>Add additional stock to an existing product.</p>
+            </div>
+        </div>
+
+        <form id="addStockForm">
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label for="stockProduct">
+                        Product
+                    </label>
+
+                    <select id="stockProduct" required>
+                        <option value="">
+                            Select a product
+                        </option>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="stockQuantity">
+                        Quantity
+                    </label>
+
+                    <input
+                            type="number"
+                            id="stockQuantity"
+                            min="1"
+                            required
+                            placeholder="Enter quantity">
+                </div>
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Add Stock
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- Reserve / Release section -->
+    <section class="operation-section">
+
+        <div class="section-header">
+            <div>
+                <h2>Order Inventory Operations</h2>
+                <p>
+                    Reserve or release inventory for an order.
+                </p>
+            </div>
+        </div>
+
+        <form id="orderOperationForm">
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label for="orderId">
+                        Order ID
+                    </label>
+
+                    <input
+                            type="number"
+                            id="orderId"
+                            min="1"
+                            required
+                            placeholder="Enter order ID">
+                </div>
+
+            </div>
+
+            <div class="operation-buttons">
+
+                <button type="button"
+                        id="reserveButton"
+                        class="btn btn-primary">
+                    Reserve Stock
+                </button>
+
+                <button type="button"
+                        id="releaseButton"
+                        class="btn btn-secondary">
+                    Release Stock
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    Simple E-Commerce &copy; 2026
+</footer>
+
+
+<script src="/common/common.js"></script>
+<script src="/inventory/inventory.js"></script>
+
+</body>
+</html>

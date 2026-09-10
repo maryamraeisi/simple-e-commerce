@@ -11,6 +11,17 @@ public class InventoryMapper {
         return new InventoryResponse(
                 inventory.getId(),
                 inventory.getProductId(),
+                null,
+                inventory.getQuantity(),
+                inventory.getReservedQuantity()
+        );
+    }
+
+    public static InventoryResponse toResponse(Inventory inventory, String productName) {
+        return new InventoryResponse(
+                inventory.getId(),
+                inventory.getProductId(),
+                productName,
                 inventory.getQuantity(),
                 inventory.getReservedQuantity()
         );

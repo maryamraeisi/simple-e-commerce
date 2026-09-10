@@ -30,7 +30,7 @@ async function loadProducts() {
                         src="${product.imageUrl || '/images/product-placeholder.png'}"
                         alt="${product.name}"
                         class="product-image"
-                        <!--onerror="this.src='/images/product-placeholder.png'"-->
+                        onerror="this.src='/images/product-placeholder.png'"
                     >
 
                     <span class="status ${product.active ? "status-active" : "status-inactive"}">
