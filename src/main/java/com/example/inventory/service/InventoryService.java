@@ -1,6 +1,5 @@
 package com.example.inventory.service;
 
-import com.example.inventory.dto.CreateInventoryRequest;
 import com.example.inventory.dto.InventoryResponse;
 import com.example.inventory.entity.Inventory;
 import com.example.inventory.mapper.InventoryMapper;
@@ -8,6 +7,7 @@ import com.example.inventory.repository.InventoryRepository;
 import com.example.order.entity.Order;
 import com.example.order.entity.OrderItem;
 import com.example.order.service.OrderService;
+import com.example.product.entity.Product;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,38 +39,38 @@ public class InventoryService {
         return inventoryResponseList;
     }
 
-    public InventoryResponse createInventory(CreateInventoryRequest request) {
-        if (inventoryRepository.findByProductId(request.productId()).isPresent()) {
-            throw new IllegalArgumentException("Inventory already exists for product: " + request.productId());
+    public void createForProduct(Product product) {
+        if (inventoryRepository.findByProductId(product.getId()).isPresent()) {
+            throw new IllegalArgumentException("Inventory already exists for product: " + product.getName());
         }
 
-        Inventory inventory = Inventory.builder()
-                .productId(request.productId())
-                .quantity(request.quantity())
-                .reservedQuantity(0)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-        Inventory saved = inventoryRepository.save(inventory);
+        Inventory inventory = createNewInventory(product.getId());
 
-        return InventoryMapper.toResponse(saved);
+        inventoryRepository.save(inventory);
     }
 
     public InventoryResponse addStock(Long productId, Integer quantity) {
         Inventory inventory = getInventory(productId);
 
         if (inventory == null) {
-            inventory = new Inventory();
-            inventory.setProductId(productId);
-            inventory.setQuantity(0);
-            inventory.setReservedQuantity(0);
-            inventory.setCreatedAt(LocalDateTime.now());
+            inventory = createNewInventory(productId);
         }
 
         inventory.setQuantity(inventory.getQuantity() + quantity);
-        inventory.setUpdatedAt(LocalDateTime.now());
 
         return InventoryMapper.toResponse(inventoryRepository.save(inventory));
+    }
+
+    private Inventory createNewInventory(Long productId) {
+        Inventory inventory = Inventory.builder()
+                .productId(productId)
+                .quantity(0)
+                .reservedQuantity(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        return inventory;
     }
 
     public List<InventoryResponse> reserveStock(Long orderId) {
@@ -82,6 +82,7 @@ public class InventoryService {
             Inventory updated = reserveOrderItems(item);
             inventoryResponses.add(InventoryMapper.toResponse(updated));
         }
+
         return inventoryResponses;
     }
 
@@ -97,7 +98,7 @@ public class InventoryService {
             throw new IllegalStateException("Not enough stock for product: " + productId);
         }
 
-        inventory.setQuantity(inventory.getQuantity() - quantity);
+        inventory.setQuantity(inventory.getQuantity());
         inventory.setReservedQuantity(inventory.getReservedQuantity() + quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
 
@@ -128,7 +129,7 @@ public class InventoryService {
             throw new IllegalStateException("Cannot release more stock than reserved");
         }
 
-        inventory.setQuantity(inventory.getQuantity() + quantity);
+        inventory.setQuantity(inventory.getQuantity());
         inventory.setReservedQuantity(inventory.getReservedQuantity() - quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
 
@@ -155,7 +156,8 @@ public class InventoryService {
 
         Inventory inventory = getInventory(productId);
 
-        inventory.setReservedQuantity(inventory.getReservedQuantity() - quantity);
+        inventory.setQuantity(inventory.getQuantity() - quantity);
+        inventory.setReservedQuantity(inventory.getReservedQuantity() + quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
 
         inventoryRepository.save(inventory);

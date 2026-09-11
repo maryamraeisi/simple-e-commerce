@@ -1,56 +1,44 @@
 const INVENTORY_API = "/api/inventory";
 const PRODUCTS_API = "/api/products";
 
-
 document.addEventListener("DOMContentLoaded", () => {
-
     /*
      * inventory.html
      */
     if (document.getElementById("inventoryTableBody")) {
         initializeInventoryPage();
     }
-
-
-    /*
-     * inventory-form.html
-     */
-    if (document.getElementById("inventoryForm")) {
-        initializeInventoryForm();
-    }
-
 });
 
-
 /* =========================================================
-   Inventory page
-   ========================================================= */
+Inventory page
+========================================================= */
 
 async function initializeInventoryPage() {
-
     try {
 
         await loadInventory();
-
-        await loadProductsForStock();
 
     } catch (error) {
 
         console.error(error);
 
-        showInventoryMessage(
-            "Failed to load inventory.",
-            "error"
-        );
+        showInventoryMessage("Failed to load inventory.", "error");
 
     }
 
 
+    /*
+     * Live product search
+     */
     document
-        .getElementById("addStockForm")
-        .addEventListener("submit", handleAddStock);
+        .getElementById("inventorySearch")
+        .addEventListener("input", handleInventorySearch);
 
 
+    /*
+     * Reserve / Release
+     */
     document
         .getElementById("reserveButton")
         .addEventListener("click", handleReserve);
@@ -61,13 +49,11 @@ async function initializeInventoryPage() {
         .addEventListener("click", handleRelease);
 }
 
-
 /* =========================================================
-   Load inventory
-   ========================================================= */
+Load inventory
+========================================================= */
 
 async function loadInventory() {
-
     const response = await fetch(INVENTORY_API);
 
     if (!response.ok) {
@@ -76,11 +62,10 @@ async function loadInventory() {
 
     const inventoryList = await response.json();
 
-    const tableBody =
-        document.getElementById("inventoryTableBody");
 
-    const emptyState =
-        document.getElementById("emptyState");
+    const tableBody = document.getElementById("inventoryTableBody");
+
+    const emptyState = document.getElementById("emptyState");
 
 
     tableBody.innerHTML = "";
@@ -99,167 +84,210 @@ async function loadInventory() {
 
     inventoryList.forEach(inventory => {
 
-        const row =
-            document.createElement("tr");
+        const row = document.createElement("tr");
 
-        const available =
-            inventory.quantity -
-            inventory.reservedQuantity;
+
+        /*
+         * Store the product name on the row.
+         *
+         * This is useful for live search.
+         */
+        row.dataset.productName = (inventory.productName || "").toLowerCase();
+        row.dataset.productId = inventory.productId;
+        const available = inventory.quantity - inventory.reservedQuantity;
 
 
         row.innerHTML = `
-            <td class="inventory-product">
-                ${escapeHtml(inventory.productName)}
-            </td>
+    <td class="inventory-product">
+        ${escapeHtml(inventory.productName)}
+        </td>
 
-            <td class="quantity">
-                ${inventory.quantity}
-            </td>
+    <td class="quantity">
+        ${inventory.quantity}
+    </td>
 
-            <td class="reserved">
-                ${inventory.reservedQuantity}
-            </td>
+    <td class="reserved">
+        ${inventory.reservedQuantity}
+    </td>
 
-            <td class="available">
-                ${available}
-            </td>
+    <td class="available">
+        ${available}
+    </td>
 
-            <td class="table-action">
-                <button
-                    class="btn btn-primary"
-                    onclick="selectProductForStock(${inventory.productId})">
-                    Add Stock
-                </button>
-            </td>
+    <td class="table-action">
+
+        <div class="stock-action">
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                onclick="showAddStockInput(this, ${inventory.productId})">
+                Add Stock
+            </button>
+
+        </div>
+
+    </td>
         `;
 
 
         tableBody.appendChild(row);
     });
+
 }
 
-
 /* =========================================================
-   Load products for Add Stock
-   ========================================================= */
+Live inventory search
+========================================================= */
 
-async function loadProductsForStock() {
+function handleInventorySearch(event) {
+    const searchTerm = event.target.value
+        .trim()
+        .toLowerCase();
 
-    const response =
-        await fetch(PRODUCTS_API);
 
-    if (!response.ok) {
-        throw new Error("Failed to load products.");
+    const rows = document.querySelectorAll("#inventoryTableBody tr");
+
+
+    let visibleRows = 0;
+
+
+    rows.forEach(row => {
+
+        const productName = row.dataset.productName || "";
+
+
+        const matches = productName.includes(searchTerm);
+
+
+        if (matches) {
+
+            row.style.display = "";
+
+            visibleRows++;
+
+        } else {
+
+            row.style.display = "none";
+        }
+
+    });
+
+
+    /*
+     * Show empty state when the search
+     * doesn't match any product.
+     */
+    const emptyState = document.getElementById("emptyState");
+
+
+    if (visibleRows === 0) {
+
+        emptyState.style.display = "block";
+
+    } else {
+
+        emptyState.style.display = "none";
     }
 
-    const products =
-        await response.json();
+}
 
-    const select =
-        document.getElementById("stockProduct");
+/* =========================================================
+Show Add Stock input
+========================================================= */
+
+function showAddStockInput(button, productId) {
+    const actionContainer = button.parentElement;
 
 
-    select.innerHTML = `
-        <option value="">
-            Select a product
-        </option>
+    /*
+     * Don't create another input if
+     * one is already open.
+     */
+    if (actionContainer.querySelector(".stock-input")) {
+        return;
+    }
+
+
+    actionContainer.innerHTML = `
+    <div class="stock-input">
+
+        <input
+    type="number"
+    class="stock-quantity"
+    min="1"
+    placeholder="Quantity"
+    required>
+
+    <button
+    type="button"
+    class="btn btn-primary"
+    onclick="addStockFromRow(this, ${productId})">
+        Add
+        </button>
+
+    <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="cancelAddStock(this)">
+        Cancel
+    </button>
+
+</div>
     `;
 
 
-    products.forEach(product => {
-
-        const option =
-            document.createElement("option");
-
-        option.value = product.id;
-
-        option.textContent = product.name;
-
-        select.appendChild(option);
-    });
-}
-
-
-/* =========================================================
-   Select product for Add Stock
-   ========================================================= */
-
-function selectProductForStock(productId) {
-
-    const select =
-        document.getElementById("stockProduct");
-
-    select.value = productId;
-
-    document
-        .getElementById("stockQuantity")
+    actionContainer
+        .querySelector(".stock-quantity")
         .focus();
 
-    document
-        .querySelector(".operation-section")
-        .scrollIntoView({
-            behavior: "smooth"
-        });
 }
 
-
 /* =========================================================
-   Add stock
-   ========================================================= */
+Add stock from table row
+========================================================= */
 
-async function handleAddStock(event) {
+async function addStockFromRow(button, productId) {
 
-    event.preventDefault();
-
-
-    const productId =
-        document.getElementById("stockProduct").value;
-
-    const quantity =
-        Number(
-            document.getElementById("stockQuantity").value
-        );
+    const actionContainer = button.closest(".stock-action");
 
 
-    if (!productId) {
+    const quantityInput = actionContainer.querySelector(".stock-quantity");
 
-        showInventoryMessage(
-            "Please select a product.",
-            "error"
-        );
 
-        return;
-    }
+    const quantity = Number(quantityInput.value);
 
 
     if (!quantity || quantity <= 0) {
 
-        showInventoryMessage(
-            "Quantity must be greater than zero.",
-            "error"
-        );
+        showInventoryMessage("Quantity must be greater than zero.", "error");
+
+        quantityInput.focus();
 
         return;
     }
 
 
+    /*
+     * Prevent multiple requests while
+     * the current request is running.
+     */
+    button.disabled = true;
+
+
     try {
 
-        const response =
-            await fetch(
-                `${INVENTORY_API}/${productId}/add`,
-                {
-                    method: "POST",
+        const response = await fetch(`${INVENTORY_API}/${productId}/add`, {
+            method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-                    body: JSON.stringify({
-                        quantity: quantity
-                    })
-                }
-            );
+            body: JSON.stringify({
+                quantity: quantity
+            })
+        });
 
 
         if (!response.ok) {
@@ -267,47 +295,78 @@ async function handleAddStock(event) {
         }
 
 
-        document
-            .getElementById("addStockForm")
-            .reset();
+        showInventoryMessage("Stock added successfully.", "success");
 
 
-        showInventoryMessage(
-            "Stock added successfully.",
-            "success"
-        );
-
-
+        /*
+         * Reload inventory so the quantity,
+         * available stock, etc. are updated.
+         */
         await loadInventory();
+
+
+        /*
+         * Re-apply the current search after
+         * the table has been rebuilt.
+         */
+        const searchInput = document.getElementById("inventorySearch");
+
+
+        if (searchInput.value) {
+
+            handleInventorySearch({
+                target: searchInput
+            });
+        }
+
 
     } catch (error) {
 
         console.error(error);
 
-        showInventoryMessage(
-            "Failed to add stock.",
-            "error"
-        );
+        showInventoryMessage("Failed to add stock.", "error");
+
+
+        button.disabled = false;
     }
+
 }
 
+/* =========================================================
+Cancel Add Stock
+========================================================= */
+
+function cancelAddStock(button) {
+    const actionContainer = button.closest(".stock-action");
+    const row = button.closest("tr");
+    const productId = row.dataset.productId;
+
+    actionContainer.innerHTML = `
+        <button
+            type="button"
+            class="btn btn-primary">
+            Add Stock
+        </button>
+    `;
+
+    const newButton = actionContainer.querySelector("button");
+
+    newButton.onclick = function () {
+        showAddStockInput(newButton, productId);
+    };
+}
 
 /* =========================================================
-   Reserve stock
-   ========================================================= */
+Reserve stock
+========================================================= */
 
 async function handleReserve() {
-
-    const orderId =
-        document.getElementById("orderId").value;
+    const orderId = document.getElementById("orderId").value;
 
 
     if (!orderId) {
 
-        showInventoryMessage(
-            "Please enter an order ID.",
-            "error"
-        );
+        showInventoryMessage("Please enter an order ID.", "error");
 
         return;
     }
@@ -315,13 +374,9 @@ async function handleReserve() {
 
     try {
 
-        const response =
-            await fetch(
-                `${INVENTORY_API}/${orderId}/reserve`,
-                {
-                    method: "POST"
-                }
-            );
+        const response = await fetch(`${INVENTORY_API}/${orderId}/reserve`, {
+            method: "POST"
+        });
 
 
         if (!response.ok) {
@@ -329,42 +384,47 @@ async function handleReserve() {
         }
 
 
-        showInventoryMessage(
-            "Stock reserved successfully.",
-            "success"
-        );
+        showInventoryMessage("Stock reserved successfully.", "success");
 
 
         await loadInventory();
+
+
+        /*
+         * Preserve the current search after
+         * reloading the table.
+         */
+        const searchInput = document.getElementById("inventorySearch");
+
+
+        if (searchInput.value) {
+
+            handleInventorySearch({
+                target: searchInput
+            });
+        }
+
 
     } catch (error) {
 
         console.error(error);
 
-        showInventoryMessage(
-            "Failed to reserve stock.",
-            "error"
-        );
+        showInventoryMessage("Failed to reserve stock.", "error");
     }
+
 }
 
-
 /* =========================================================
-   Release stock
-   ========================================================= */
+Release stock
+========================================================= */
 
 async function handleRelease() {
-
-    const orderId =
-        document.getElementById("orderId").value;
+    const orderId = document.getElementById("orderId").value;
 
 
     if (!orderId) {
 
-        showInventoryMessage(
-            "Please enter an order ID.",
-            "error"
-        );
+        showInventoryMessage("Please enter an order ID.", "error");
 
         return;
     }
@@ -372,13 +432,9 @@ async function handleRelease() {
 
     try {
 
-        const response =
-            await fetch(
-                `${INVENTORY_API}/${orderId}/release`,
-                {
-                    method: "POST"
-                }
-            );
+        const response = await fetch(`${INVENTORY_API}/${orderId}/release`, {
+            method: "POST"
+        });
 
 
         if (!response.ok) {
@@ -386,212 +442,42 @@ async function handleRelease() {
         }
 
 
-        showInventoryMessage(
-            "Stock released successfully.",
-            "success"
-        );
+        showInventoryMessage("Stock released successfully.", "success");
 
 
         await loadInventory();
 
-    } catch (error) {
 
-        console.error(error);
-
-        showInventoryMessage(
-            "Failed to release stock.",
-            "error"
-        );
-    }
-}
+        /*
+         * Preserve the current search after
+         * reloading the table.
+         */
+        const searchInput = document.getElementById("inventorySearch");
 
 
-/* =========================================================
-   Inventory form
-   ========================================================= */
+        if (searchInput.value) {
 
-async function initializeInventoryForm() {
-
-    try {
-
-        await loadProductsForInventoryForm();
-
-    } catch (error) {
-
-        console.error(error);
-
-        showInventoryMessage(
-            "Failed to load products.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    document
-        .getElementById("inventoryForm")
-        .addEventListener(
-            "submit",
-            handleCreateInventory
-        );
-}
-
-
-/* =========================================================
-   Load products for Create Inventory
-   ========================================================= */
-
-async function loadProductsForInventoryForm() {
-
-    const response =
-        await fetch(PRODUCTS_API);
-
-
-    if (!response.ok) {
-        throw new Error("Failed to load products.");
-    }
-
-
-    const products =
-        await response.json();
-
-
-    const select =
-        document.getElementById("product");
-
-
-    select.innerHTML = `
-        <option value="">
-            Select a product
-        </option>
-    `;
-
-
-    products
-        .filter(product => product.active)
-        .forEach(product => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = product.id;
-
-            option.textContent = product.name;
-
-            select.appendChild(option);
-        });
-}
-
-
-/* =========================================================
-   Create inventory
-   ========================================================= */
-
-async function handleCreateInventory(event) {
-
-    event.preventDefault();
-
-
-    const productId =
-        Number(
-            document.getElementById("product").value
-        );
-
-
-    const quantity =
-        Number(
-            document.getElementById("quantity").value
-        );
-
-
-    if (!productId) {
-
-        showInventoryMessage(
-            "Please select a product.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    if (quantity < 0 || Number.isNaN(quantity)) {
-
-        showInventoryMessage(
-            "Please enter a valid quantity.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    try {
-
-        const response =
-            await fetch(
-                INVENTORY_API,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        productId: productId,
-                        quantity: quantity
-                    })
-                }
-            );
-
-
-        if (!response.ok) {
-            throw new Error(
-                "Failed to create inventory."
-            );
+            handleInventorySearch({
+                target: searchInput
+            });
         }
 
 
-        showInventoryMessage(
-            "Inventory created successfully.",
-            "success"
-        );
-
-
-        document
-            .getElementById("inventoryForm")
-            .reset();
-
-
-        setTimeout(() => {
-
-            window.location.href =
-                "/inventory/inventory.html";
-
-        }, 800);
-
     } catch (error) {
 
         console.error(error);
 
-        showInventoryMessage(
-            "Failed to create inventory.",
-            "error"
-        );
+        showInventoryMessage("Failed to release stock.", "error");
     }
 }
 
-
 /* =========================================================
-   Messages
-   ========================================================= */
+Messages
+========================================================= */
 
 function showInventoryMessage(message, type) {
 
-    const element =
-        document.getElementById("message");
+    const element = document.getElementById("message");
 
 
     if (!element) {
@@ -604,23 +490,16 @@ function showInventoryMessage(message, type) {
     element.style.display = "block";
 
 
-    element.classList.remove(
-        "message-success",
-        "message-error"
-    );
+    element.classList.remove("message-success", "message-error");
 
 
     if (type === "success") {
 
-        element.classList.add(
-            "message-success"
-        );
+        element.classList.add("message-success");
 
     } else {
 
-        element.classList.add(
-            "message-error"
-        );
+        element.classList.add("message-error");
     }
 
 
@@ -631,10 +510,9 @@ function showInventoryMessage(message, type) {
     }, 4000);
 }
 
-
 /* =========================================================
-   Security helper
-   ========================================================= */
+Security helper
+========================================================= */
 
 function escapeHtml(value) {
 
@@ -648,4 +526,5 @@ function escapeHtml(value) {
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+
 }

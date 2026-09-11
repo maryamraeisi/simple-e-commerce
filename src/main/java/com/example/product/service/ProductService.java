@@ -1,11 +1,13 @@
 package com.example.product.service;
 
+import com.example.inventory.service.InventoryService;
 import com.example.product.repository.ProductRepository;
 import com.example.product.dto.CreateProductRequest;
 import com.example.product.dto.ProductResponse;
 import com.example.product.dto.UpdateProductRequest;
 import com.example.product.entity.Product;
 import com.example.product.mapper.ProductMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,9 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository repository;
+    private final InventoryService inventoryService;
 
+    @Transactional
     public ProductResponse create(CreateProductRequest request) {
         Product product = Product.builder()
                 .name(request.name())
@@ -28,12 +32,13 @@ public class ProductService {
 
         product = repository.save(product);
 
+        inventoryService.createForProduct(product);
+
         return ProductMapper.toResponse(product);
     }
 
     public ProductResponse getById(Long id) {
         Product product = repository.findById(id).orElseThrow();
-
         return ProductMapper.toResponse(product);
     }
 
@@ -63,7 +68,6 @@ public class ProductService {
 
     public void delete(Long id) {
         Product product = repository.findById(id).orElseThrow();
-
         repository.delete(product);
     }
 }

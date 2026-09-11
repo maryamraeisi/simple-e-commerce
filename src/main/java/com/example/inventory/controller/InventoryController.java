@@ -1,6 +1,5 @@
 package com.example.inventory.controller;
 
-import com.example.inventory.dto.CreateInventoryRequest;
 import com.example.inventory.dto.InventoryResponse;
 import com.example.inventory.dto.UpdateStockRequest;
 import com.example.inventory.service.InventoryService;
@@ -25,11 +24,6 @@ public class InventoryController {
     @GetMapping("/{productId}")
     public ResponseEntity<InventoryResponse> getByProductId(@PathVariable Long productId) {
         return ResponseEntity.ok(inventoryService.getByProductId(productId));
-    }
-
-    @PostMapping
-    public ResponseEntity<InventoryResponse> create(@RequestBody CreateInventoryRequest request) {
-        return ResponseEntity.ok(inventoryService.createInventory(request));
     }
 
     @PostMapping("/{productId}/add")
