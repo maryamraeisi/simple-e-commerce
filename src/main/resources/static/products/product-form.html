@@ -91,15 +91,23 @@
 
         <div class="form-group">
 
-            <label for="imageUrl">
-                Image URL
+            <label for="image">
+                Product Image
             </label>
 
             <input
-                    type="url"
-                    id="imageUrl"
-                    name="imageUrl"
-                    placeholder="https://example.com/product.jpg">
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/jpeg,image/png,image/webp">
+
+            <div id="image-preview-container">
+                <img
+                        id="image-preview"
+                        src=""
+                        alt="Product image preview"
+                        style="display: none;">
+            </div>
 
         </div>
 

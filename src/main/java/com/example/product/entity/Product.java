@@ -1,4 +1,5 @@
 package com.example.product.entity;
+import com.example.inventory.entity.Inventory;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -27,4 +28,8 @@ public class Product {
     private String imageUrl;
 
     private boolean active;
+
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, orphanRemoval = true)
+    private Inventory inventory;
 }

@@ -8,6 +8,7 @@ import com.example.order.entity.Order;
 import com.example.order.entity.OrderItem;
 import com.example.order.service.OrderService;
 import com.example.product.entity.Product;
+import com.example.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,38 +40,16 @@ public class InventoryService {
         return inventoryResponseList;
     }
 
-    public void createForProduct(Product product) {
-        if (inventoryRepository.findByProductId(product.getId()).isPresent()) {
-            throw new IllegalArgumentException("Inventory already exists for product: " + product.getName());
-        }
-
-        Inventory inventory = createNewInventory(product.getId());
-
-        inventoryRepository.save(inventory);
-    }
-
     public InventoryResponse addStock(Long productId, Integer quantity) {
         Inventory inventory = getInventory(productId);
 
         if (inventory == null) {
-            inventory = createNewInventory(productId);
+            throw new IllegalArgumentException("Inventory does not exist for product: " + productId);
         }
 
         inventory.setQuantity(inventory.getQuantity() + quantity);
 
         return InventoryMapper.toResponse(inventoryRepository.save(inventory));
-    }
-
-    private Inventory createNewInventory(Long productId) {
-        Inventory inventory = Inventory.builder()
-                .productId(productId)
-                .quantity(0)
-                .reservedQuantity(0)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        return inventory;
     }
 
     public List<InventoryResponse> reserveStock(Long orderId) {

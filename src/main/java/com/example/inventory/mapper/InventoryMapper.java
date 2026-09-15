@@ -10,7 +10,7 @@ public class InventoryMapper {
     public static InventoryResponse toResponse(Inventory inventory) {
         return new InventoryResponse(
                 inventory.getId(),
-                inventory.getProductId(),
+                inventory.getProduct().getId(),
                 null,
                 inventory.getQuantity(),
                 inventory.getReservedQuantity()
@@ -20,7 +20,7 @@ public class InventoryMapper {
     public static InventoryResponse toResponse(Inventory inventory, String productName) {
         return new InventoryResponse(
                 inventory.getId(),
-                inventory.getProductId(),
+                inventory.getProduct().getId(),
                 productName,
                 inventory.getQuantity(),
                 inventory.getReservedQuantity()

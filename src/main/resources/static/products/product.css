@@ -88,19 +88,16 @@ body {
     border-radius: 8px;
     overflow: hidden;
 
-    box-shadow:
-            0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-    transition:
-            transform 0.2s,
-            box-shadow 0.2s;
+    transition: transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .product-card:hover {
     transform: translateY(-3px);
 
-    box-shadow:
-            0 5px 15px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
 }
 
 
@@ -195,8 +192,7 @@ body {
 
     border-radius: 8px;
 
-    box-shadow:
-            0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .form-group {
@@ -263,8 +259,7 @@ body {
 
     overflow: hidden;
 
-    box-shadow:
-            0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .detail-image {
@@ -371,4 +366,20 @@ body {
     .actions {
         flex-direction: column;
     }
+}
+
+#image-preview {
+    display: block !important;
+    width: 180px !important;
+    height: 180px !important;
+    max-width: 180px !important;
+    max-height: 180px !important;
+    object-fit: contain !important;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+#image-preview[src=""] {
+    display: none !important;
 }
