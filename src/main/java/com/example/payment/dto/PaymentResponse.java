@@ -9,5 +9,4 @@ public record PaymentResponse(
         Long orderId,
         BigDecimal amount,
         PaymentStatus status
-) {
-}
+) {}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details</title>
+
+    <link rel="stylesheet" href="../common/common.css">
+    <link rel="stylesheet" href="payment.css">
+</head>
+<body>
+
+<div class="details-container">
+
+    <div class="page-header">
+
+        <h1>Payment Details</h1>
+
+        <a
+                href="payments.html"
+                class="btn btn-secondary">
+            Back
+        </a>
+
+    </div>
+
+
+    <div id="loadingMessage">
+        Loading payment...
+    </div>
+
+
+    <div id="paymentDetails" class="details-card">
+
+        <div class="detail-row">
+            <span class="detail-label">Payment ID</span>
+            <span id="paymentId"></span>
+        </div>
+
+
+        <div class="detail-row">
+            <span class="detail-label">Order ID</span>
+            <span id="orderId"></span>
+        </div>
+
+
+        <div class="detail-row">
+            <span class="detail-label">Amount</span>
+            <span id="amount"></span>
+        </div>
+
+
+        <div class="detail-row">
+            <span class="detail-label">Status</span>
+
+            <span id="status"></span>
+        </div>
+
+
+        <div id="actionButtons" class="form-actions">
+
+            <button
+                    id="completeButton"
+                    class="btn btn-success">
+                Complete Payment
+            </button>
+
+            <button
+                    id="failButton"
+                    class="btn btn-danger">
+                Fail Payment
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div id="errorMessage" class="error-message"></div>
+
+</div>
+
+<script src="../common/common.js"></script>
+<script src="payment-details.js"></script>
+
+</body>
+</html>

@@ -19,6 +19,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +74,16 @@ public class PaymentService {
         sendPaymentFailedEvent(payment);
 
         return PaymentMapper.toResponse(updated);
+    }
+
+    public List<PaymentResponse> getAll() {
+        List<Payment> payments = paymentRepository.findAll();
+        return payments.stream().map(PaymentMapper::toResponse).toList();
+    }
+
+    public PaymentResponse getById(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow();
+        return PaymentMapper.toResponse(payment);
     }
 
     private void sendPaymentFailedEvent(Payment payment) {

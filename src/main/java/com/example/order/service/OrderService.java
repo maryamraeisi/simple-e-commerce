@@ -43,7 +43,19 @@ public class OrderService {
         Customer customer = customerRepository.findById(request.customerId()).orElseThrow();
 
         BigDecimal total = BigDecimal.ZERO;
-        List<OrderItem> items = getOrderItems(request, total);
+        List<OrderItem> items = new ArrayList<>();
+
+        for (OrderItemRequest requestItem : request.items()) {
+            Product product = productRepository.findById(requestItem.productId()).orElseThrow();
+
+            Integer quantity = requestItem.quantity();
+            BigDecimal subtotal = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+            total = total.add(subtotal);
+
+            OrderItem orderItem = prepareOrderItem(quantity, product, subtotal);
+            items.add(orderItem);
+        }
+
         Order order = prepareOrder(customer, items, total);
         order = orderRepository.save(order);
 
@@ -80,23 +92,6 @@ public class OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow();
         order.setStatus(orderStatus);
         orderRepository.save(order);
-    }
-
-    private List<OrderItem> getOrderItems(CreateOrderRequest request, BigDecimal total) {
-        List<OrderItem> items = new ArrayList<>();
-
-        for (OrderItemRequest requestItem : request.items()) {
-            Product product = productRepository.findById(requestItem.productId()).orElseThrow();
-
-            Integer quantity = requestItem.quantity();
-            BigDecimal subtotal = product.getPrice().multiply(BigDecimal.valueOf(quantity));
-            total = total.add(subtotal);
-
-            OrderItem orderItem = prepareOrderItem(quantity, product, subtotal);
-            items.add(orderItem);
-        }
-
-        return items;
     }
 
         private OrderItem prepareOrderItem(Integer quantity, Product product, BigDecimal subtotal) {
