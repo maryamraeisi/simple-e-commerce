@@ -4,6 +4,7 @@ import com.example.order.dto.CreateOrderRequest;
 import com.example.order.dto.OrderResponse;
 import com.example.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,18 +17,18 @@ public class OrderController {
     private final OrderService service;
 
     @PostMapping
-    public OrderResponse createOrder(@RequestBody CreateOrderRequest request) {
-        return service.createOrder(request);
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+        return ResponseEntity.ok(service.createOrder(request));
     }
 
     @GetMapping("/{id}")
-    public OrderResponse getOrder(@PathVariable Long id) {
-        return service.getOrder(id);
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getOrder(id));
     }
 
     @GetMapping
-    public List<OrderResponse> getAllOrders() {
-        return service.getAllOrders();
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        return ResponseEntity.ok(service.getAllOrders());
     }
 
     @PatchMapping("/{id}/cancel")

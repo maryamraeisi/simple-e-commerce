@@ -1,5 +1,6 @@
 package com.example.customer.entity;
 
+import com.example.cart.entity.Cart;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,9 +22,16 @@ public class Customer {
 
     private String lastName;
 
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private String password;
 
     private String phoneNumber;
 
     private LocalDateTime createdAt;
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Cart cart;
 }

@@ -1,5 +1,6 @@
 package com.example.customer.service;
 
+import com.example.cart.entity.Cart;
 import com.example.customer.dto.CreateCustomerRequest;
 import com.example.customer.dto.CustomerResponse;
 import com.example.customer.dto.UpdateCustomerRequest;
@@ -23,13 +24,18 @@ public class CustomerService {
             throw new IllegalArgumentException("Email already exists.");
         }
 
+        Cart cart = new Cart();
+
         Customer customer = Customer.builder()
                         .firstName(request.firstName())
                         .lastName(request.lastName())
                         .email(request.email())
                         .phoneNumber(request.phoneNumber())
+                        .cart(cart)
                         .createdAt(LocalDateTime.now())
                         .build();
+
+        cart.setCustomer(customer);
 
         customer = repository.save(customer);
 
