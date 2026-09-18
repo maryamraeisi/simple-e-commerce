@@ -133,6 +133,12 @@
 </header>
 
 <main class="container">
+    <div class="auth-section">
+        <div id="logged-out" class="auth-state"><a href="/auth/login.html" class="btn">Login</a></div>
+        <div id="logged-in" class="auth-state" hidden><span id="customer-name"></span>
+            <button type="button" id="logout-button" class="btn"> Logout</button>
+        </div>
+    </div>
 
     <section class="section-title">
         <h2>Dashboard</h2>
@@ -238,6 +244,6 @@
 <footer class="footer">
     Simple E-Commerce &copy; 2026
 </footer>
-
+<script src="/common/auth.js"></script>
 </body>
 </html>

@@ -1,8 +1,12 @@
 package com.example.customer.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public record CreateCustomerRequest(
-        String firstName,
-        String lastName,
-        String email,
-        String phoneNumber
+        @NotBlank String firstName,
+        @NotBlank String lastName,
+        @NotBlank @Email String email,
+        String phoneNumber,
+        @NotBlank String password
 ) {}

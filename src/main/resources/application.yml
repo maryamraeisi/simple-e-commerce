@@ -30,3 +30,8 @@ app:
   upload:
     dir: ${user.dir}/uploads
 
+server:
+  servlet:
+    session:
+      tracking-modes: cookie
+

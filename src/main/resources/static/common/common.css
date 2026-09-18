@@ -272,3 +272,21 @@ tr:last-child td {
         text-align: center;
     }
 }
+
+.auth-section {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.auth-state {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#customer-name {
+    font-weight: 600;
+}

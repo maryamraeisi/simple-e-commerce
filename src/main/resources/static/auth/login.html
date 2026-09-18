@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Simple E-Commerce</title>
+    <link rel="stylesheet" href="/auth/login.css">
+</head>
+<body>
+<div class="login-page">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo"><span class="logo-mark">S</span> <span>Simple Shop</span></div>
+            <h1>Welcome back</h1>
+            <p>Sign in to continue shopping.</p></div>
+        <div id="message"></div>
+        <form id="login-form">
+            <div class="form-group"><label for="email">Email</label> <input type="email" id="email" name="email"
+                                                                            placeholder="you@example.com"
+                                                                            autocomplete="email" required></div>
+            <div class="form-group">
+                <div class="password-label"><label for="password">Password</label></div>
+                <div class="password-wrapper"><input type="password" id="password" name="password"
+                                                     placeholder="Enter your password" autocomplete="current-password"
+                                                     required>
+                    <button type="button" id="toggle-password" class="password-toggle" aria-label="Show password">
+                        Show
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="login-button" id="login-button"> Login</button>
+        </form>
+        <div class="login-footer"><span>Don't have an account?</span> <a href="/auth/signup.html">Create an
+            account</a></div>
+        <a href="/index.html" class="back-link"> ← Back to store </a></div>
+</div>
+<script src="/auth/login.js"></script>
+</body>
+</html>

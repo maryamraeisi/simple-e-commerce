@@ -8,6 +8,7 @@ import com.example.customer.entity.Customer;
 import com.example.customer.mapper.CustomerMapper;
 import com.example.customer.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     public CustomerResponse create(CreateCustomerRequest request) {
         if (repository.existsByEmail(request.email())) {
@@ -30,6 +32,7 @@ public class CustomerService {
                         .firstName(request.firstName())
                         .lastName(request.lastName())
                         .email(request.email())
+                        .password(passwordEncoder.encode(request.password()))
                         .phoneNumber(request.phoneNumber())
                         .cart(cart)
                         .createdAt(LocalDateTime.now())
