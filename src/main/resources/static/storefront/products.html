@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Simple Shop</title>
+    <link rel="stylesheet" href="/common/common.css">
+    <link rel="stylesheet" href="/storefront/products.css">
+</head>
+<body>
+<header class="store-header"><a href="/index.html" class="logo"> Simple Shop </a>
+    <nav class="main-nav"><a href="/storefront/products.html" class="active"> Products </a> <a href="/cart/cart.html">
+        Cart </a> <a href="/orders/orders.html"> My Orders </a></nav>
+    <div class="auth-area">
+        <div id="logged-out" class="auth-state"><a href="/auth/login.html" class="login-button"> Login </a></div>
+        <div id="logged-in" class="auth-state" hidden><span id="customer-name"></span>
+            <button type="button" id="logout-button" class="logout-button"> Logout</button>
+        </div>
+    </div>
+</header>
+<main class="storefront-container">
+    <section class="hero"><p class="eyebrow"> Simple Shop </p>
+        <h1> Discover our products </h1>
+        <p> Browse our collection and find something you'll love. </p></section>
+    <section class="products-section">
+        <div class="section-header"><h2>Products</h2></div>
+        <div id="loading" class="loading"> Loading products...</div>
+        <div id="error-message" class="message error" hidden></div>
+        <div id="empty-message" class="empty-message" hidden><h3> No products available </h3>
+            <p> There are currently no products available. </p></div>
+        <div id="products-grid" class="products-grid"></div>
+    </section>
+</main>
+<script src="/storefront/products.js"></script>
+<script src="/common/auth.js"></script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package com.example.cart.dto;
 
-public record UpdateCartRequest(
+public record UpdateCartItemRequest(
         Integer quantity
-) {}
+) {
+}

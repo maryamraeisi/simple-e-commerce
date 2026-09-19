@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Product Details - Simple Shop</title>
+
+    <link rel="stylesheet" href="/common/common.css">
+    <link rel="stylesheet" href="/storefront/product-details.css">
+
+</head>
+
+<body>
+
+<header class="store-header">
+
+    <a href="/index.html" class="logo">
+        Simple Shop
+    </a>
+
+    <nav class="main-nav">
+        <a href="/storefront/products.html">
+            Products
+        </a>
+
+        <a href="/cart/cart.html">
+            Cart
+        </a>
+
+        <a href="/orders/orders.html">
+            My Orders
+        </a>
+    </nav>
+
+    <div class="auth-area">
+
+        <div id="logged-out" class="auth-state">
+            <a href="/auth/login.html" class="login-button">
+                Login
+            </a>
+        </div>
+
+        <div id="logged-in" class="auth-state" hidden>
+            <span id="customer-name"></span>
+
+            <button
+                    type="button"
+                    id="logout-button"
+                    class="logout-button">
+                Logout
+            </button>
+        </div>
+
+    </div>
+
+</header>
+
+<main class="product-details-container">
+
+    <div class="back-link-container">
+        <a href="/storefront/products.html" class="back-link">
+            ← Back to Products
+        </a>
+    </div>
+
+
+    <div
+            id="loading"
+            class="loading">
+        Loading product...
+    </div>
+
+
+    <div
+            id="error-message"
+            class="message error"
+            hidden>
+    </div>
+
+
+    <section
+            id="product-details"
+            class="product-details"
+            hidden>
+
+        <div class="product-image-section">
+
+            <div class="product-image-container">
+
+                <img
+                        id="product-image"
+                        class="product-image"
+                        alt="">
+
+                <div
+                        id="image-placeholder"
+                        class="product-image-placeholder"
+                        hidden>
+                    No image available
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="product-info">
+
+            <p class="eyebrow">
+                Product
+            </p>
+
+            <h1
+                    id="product-name"
+                    class="product-name">
+            </h1>
+
+            <p
+                    id="product-price"
+                    class="product-price">
+            </p>
+
+            <div class="divider"></div>
+
+            <p
+                    id="product-description"
+                    class="product-description">
+            </p>
+
+
+            <div class="product-actions">
+
+                <div class="quantity-group">
+
+                    <label
+                            for="quantity">
+                        Quantity
+                    </label>
+
+                    <div class="quantity-control">
+
+                        <button
+                                type="button"
+                                id="decrease-quantity"
+                                class="quantity-button">
+                            −
+                        </button>
+
+                        <input
+                                type="number"
+                                id="quantity"
+                                value="1"
+                                min="1"
+                                step="1">
+
+                        <button
+                                type="button"
+                                id="increase-quantity"
+                                class="quantity-button">
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                        type="button"
+                        id="add-to-cart-button"
+                        class="add-to-cart-button">
+                    Add to Cart
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script src="/storefront/product-details.js"></script>
+
+<script src="/common/auth.js"></script>
+
+</body> </html>

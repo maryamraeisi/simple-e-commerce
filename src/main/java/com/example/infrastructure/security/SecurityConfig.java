@@ -3,6 +3,7 @@ package com.example.infrastructure.security;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -63,11 +64,14 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/auth/**",
                                 "/common/**",
+                                "/storefront/**",
+                                "/uploads/**",
                                 "/customers/**",
                                 "/products/**",
                                 "/inventory/**",
                                 "/orders/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .anyRequest()
                         .authenticated())
                 .headers(headers -> headers
