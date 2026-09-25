@@ -42,7 +42,7 @@ form.addEventListener("submit", async function (event) {
                 throw new Error("Login failed.");
             }
 
-            window.location.href = "/storefront/products.html";
+            window.location.href = "../index.html";
         } catch (error) {
             console.error(error);
             showMessage(error.message || "Login failed.", "error");

@@ -86,7 +86,7 @@ form.addEventListener("submit", async function (event) {
             console.error(errorText);
             throw new Error("Request failed");
         }
-        window.location.href = "/products/products.html";
+        window.location.href = "products.html";
     } catch (error) {
         console.error(error);
         showMessage(productId ? "Failed to update product." : "Failed to create product.", "error");
