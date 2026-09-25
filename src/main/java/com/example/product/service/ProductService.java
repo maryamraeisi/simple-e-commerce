@@ -35,8 +35,14 @@ public class ProductService {
     }
 
     public ProductResponse getById(Long id) {
-        Product product = repository.findById(id).orElseThrow();
+        Product product = repository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Product not found: " + id));
         return ProductMapper.toResponse(product);
+    }
+
+    public Product getProductById(Long id) {
+        return repository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Product not found: " + id));
     }
 
     public List<ProductResponse> getAll() {

@@ -1,10 +1,11 @@
 package com.example.cart.controller;
 
 import com.example.cart.dto.AddToCartRequest;
-import com.example.cart.dto.MergeCartItemsRequest;
 import com.example.cart.dto.UpdateCartItemRequest;
 import com.example.cart.dto.CartResponse;
 import com.example.cart.service.CartService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,37 +18,40 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping
-    public ResponseEntity<CartResponse> getUserCart() {
-        return ResponseEntity.ok(cartService.getUserCart());
+    public ResponseEntity<CartResponse> getUserCart(HttpServletRequest httpRequest,
+                                                    HttpServletResponse httpResponse) {
+        return ResponseEntity.ok(cartService.getUserCart(httpRequest, httpResponse));
     }
 
     @PostMapping("/items")
-    public ResponseEntity<CartResponse> addToCart(@Valid @RequestBody AddToCartRequest request) {
-        return ResponseEntity.ok(cartService.addToCart(request));
+    public ResponseEntity<CartResponse> addToCart(@Valid @RequestBody AddToCartRequest addToCartRequest,
+                                                  HttpServletRequest httpRequest,
+                                                  HttpServletResponse httpResponse) {
+        return ResponseEntity.ok(cartService.addToCart(addToCartRequest, httpRequest, httpResponse));
     }
 
     @PatchMapping("/items/{id}")
     public ResponseEntity<Void> changeItemQuantity(@PathVariable(name = "id") Long itemId,
-                                               @RequestBody UpdateCartItemRequest request) {
-        cartService.changeItemQuantity(itemId, request);
-        return ResponseEntity.ok().build();
+                                                   @Valid @RequestBody UpdateCartItemRequest updateCartItemRequest,
+                                                   HttpServletRequest httpRequest,
+                                                   HttpServletResponse httpResponse) {
+        cartService.changeItemQuantity(itemId, updateCartItemRequest, httpRequest, httpResponse);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/items/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable(name = "id") Long itemId) {
-        cartService.deleteItem(itemId);
+    public ResponseEntity<Void> deleteItem(@PathVariable(name = "id") Long itemId,
+                                           HttpServletRequest httpRequest,
+                                           HttpServletResponse httpResponse) {
+        cartService.deleteItem(itemId, httpRequest, httpResponse);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/items")
-    public ResponseEntity<Void> deleteAllItems() {
-        cartService.deleteAllItems();
+    public ResponseEntity<Void> deleteAllItems(HttpServletRequest httpRequest,
+                                               HttpServletResponse httpResponse) {
+        cartService.deleteAllItems(httpRequest, httpResponse);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/merge")
-    public ResponseEntity<CartResponse> mergeItems(@Valid @RequestBody MergeCartItemsRequest request) {
-        return ResponseEntity.ok(cartService.mergeItems(request));
     }
 
 }

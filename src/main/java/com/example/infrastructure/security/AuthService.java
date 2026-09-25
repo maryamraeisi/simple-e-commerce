@@ -1,5 +1,6 @@
 package com.example.infrastructure.security;
 
+import com.example.cart.service.CartService;
 import com.example.customer.dto.CreateCustomerRequest;
 import com.example.customer.dto.CustomerResponse;
 import com.example.customer.entity.Customer;
@@ -17,8 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -27,11 +26,22 @@ public class AuthService {
     private final SecurityContextRepository securityContextRepository;
     private final UserContext userContext;
     private final CustomerService customerService;
+    private final CartService cartService;
 
-    public void login(LoginRequest loginRequest, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+    public void login(LoginRequest loginRequest,
+                      HttpServletRequest httpRequest,
+                      HttpServletResponse httpResponse) {
+
+        setSecurityContext(loginRequest, httpRequest, httpResponse);
+        cartService.mergeGuestCart(httpRequest, httpResponse);
+    }
+
+    private void setSecurityContext(LoginRequest loginRequest,
+                                    HttpServletRequest httpRequest,
+                                    HttpServletResponse httpResponse) {
+
         UsernamePasswordAuthenticationToken unauthenticated = UsernamePasswordAuthenticationToken
                 .unauthenticated(loginRequest.email(), loginRequest.password());
-
         Authentication authentication = authenticationManager.authenticate(unauthenticated);
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();

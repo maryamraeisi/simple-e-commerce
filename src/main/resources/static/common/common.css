@@ -290,3 +290,7 @@ tr:last-child td {
 #customer-name {
     font-weight: 600;
 }
+
+[hidden] {
+    display: none !important;
+}

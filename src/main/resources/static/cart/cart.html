@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Cart - Simple Shop</title>
+
+    <link rel="stylesheet" href="/common/common.css">
+    <link rel="stylesheet" href="/cart/cart.css">
+</head>
+
+<body>
+
+<header class="store-header">
+
+    <a href="/index.html" class="logo">
+        Simple Shop
+    </a>
+
+    <nav class="main-nav">
+        <a href="/storefront/products.html">
+            Products
+        </a>
+
+        <a href="/cart/cart.html" class="active">
+            Cart
+        </a>
+
+        <a href="/orders/orders.html">
+            My Orders
+        </a>
+    </nav>
+
+    <div class="auth-area">
+
+        <div id="logged-out" class="auth-state" hidden>
+            <a href="/auth/login.html" class="login-button">
+                Login
+            </a>
+        </div>
+
+        <div id="logged-in" class="auth-state" hidden>
+            <span id="customer-name"></span>
+
+            <button
+                    type="button"
+                    id="logout-button"
+                    class="logout-button">
+                Logout
+            </button>
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="cart-container">
+
+    <section class="hero">
+
+        <p class="eyebrow">
+            Simple Shop
+        </p>
+
+        <h1>
+            My Cart
+        </h1>
+
+        <p>
+            Review the products you've added to your cart.
+        </p>
+
+    </section>
+
+
+    <div class="back-link-container">
+
+        <a
+                href="/storefront/products.html"
+                class="back-link">
+            ← Continue Shopping
+        </a>
+
+    </div>
+
+
+    <section class="cart-section">
+
+        <div class="section-header">
+            <h2>Your Items</h2>
+
+            <button
+                    type="button"
+                    id="clear-cart-button"
+                    class="clear-cart-button">
+                Clear Cart
+            </button>
+        </div>
+
+
+        <div
+                id="loading"
+                class="loading">
+            Loading cart...
+        </div>
+
+
+        <div
+                id="error-message"
+                class="message error"
+                hidden>
+        </div>
+
+
+        <div
+                id="empty-message"
+                class="empty-message"
+                hidden>
+
+            <h3>
+                Your cart is empty
+            </h3>
+
+            <p>
+                Add some products to your cart to get started.
+            </p>
+
+            <a
+                    href="/storefront/products.html"
+                    class="continue-shopping-button">
+                Browse Products
+            </a>
+
+        </div>
+
+
+        <div
+                id="cart-content"
+                class="cart-content"
+                hidden>
+
+            <div id="cart-items"></div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="/cart/cart.js"></script>
+<script src="/common/auth.js"></script>
+
+</body>
+</html>

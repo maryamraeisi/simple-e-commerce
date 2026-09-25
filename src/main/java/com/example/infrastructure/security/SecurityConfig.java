@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
                         .requestMatchers("/api/auth/me").authenticated()
+                        .requestMatchers("/api/cart/**").permitAll()
 
                         // Public frontend
                         .requestMatchers(
@@ -69,7 +70,8 @@ public class SecurityConfig {
                                 "/customers/**",
                                 "/products/**",
                                 "/inventory/**",
-                                "/orders/**"
+                                "/orders/**",
+                                "/cart/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .anyRequest()
