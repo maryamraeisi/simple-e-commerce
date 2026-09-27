@@ -1,4 +1,6 @@
 const CART_API = "/api/cart";
+const ORDER_API = "/api/orders";
+const AUTH_API = "/api/auth/me";
 
 const loading = document.getElementById("loading");
 const errorMessage = document.getElementById("error-message");
@@ -6,91 +8,70 @@ const emptyMessage = document.getElementById("empty-message");
 const cartContent = document.getElementById("cart-content");
 const cartItems = document.getElementById("cart-items");
 const clearCartButton = document.getElementById("clear-cart-button");
-
+const checkoutButton = document.getElementById("checkout-button");
 
 document.addEventListener("DOMContentLoaded", () => {
-
-    clearCartButton.addEventListener(
-        "click",
-        deleteAllItems
-    );
-
+    clearCartButton.addEventListener("click", deleteAllItems);
+    checkoutButton.addEventListener("click", checkout);
     loadCart();
 });
 
-
 async function loadCart() {
-
     try {
-
-        const response =
-            await fetch(CART_API);
+        const response = await fetch(CART_API);
 
         if (!response.ok) {
             throw new Error("Failed to load cart.");
         }
 
-        const cart =
-            await response.json();
+        const cart = await response.json();
 
         loading.hidden = true;
-
         renderCart(cart);
 
-    } catch (error) {
+        const params = new URLSearchParams(window.location.search);
 
+        if (params.get("checkout") === "true" && cart.items && cart.items.length > 0) {
+            await checkout();
+        }
+
+    } catch (error) {
         console.error(error);
 
         loading.hidden = true;
-
-        showError(
-            error.message ||
-            "Failed to load cart. Please try again later."
-        );
+        showError(error.message || "Failed to load cart. Please try again later.");
     }
 }
 
-
 function renderCart(cart) {
-
     cartItems.innerHTML = "";
 
-    if (!cart.items ||
-        cart.items.length === 0) {
-
+    if (!cart.items || cart.items.length === 0) {
         cartContent.hidden = true;
         emptyMessage.hidden = false;
         clearCartButton.hidden = true;
-
+        checkoutButton.hidden = true;
         return;
     }
 
     emptyMessage.hidden = true;
     cartContent.hidden = false;
     clearCartButton.hidden = false;
+    checkoutButton.hidden = false;
 
     cart.items.forEach(item => {
-
-        const element =
-            createCartItem(item);
-
+        const element = createCartItem(item);
         cartItems.appendChild(element);
     });
 }
 
-
 function createCartItem(item) {
-
-    const container =
-        document.createElement("div");
-
+    const container = document.createElement("div");
     container.className = "cart-item";
 
     container.innerHTML = `
         <div class="cart-item-product">
-
             <div class="cart-item-image-container">
-
                 ${
         item.productImageUrl
             ? `
@@ -105,31 +86,16 @@ function createCartItem(item) {
                             </div>
                         `
     }
-
             </div>
 
             <div class="cart-item-info">
-
-                <h3>
-                    ${escapeHtml(item.productName)}
-                </h3>
-
-                <p>
-                    ${formatPrice(item.productPrice)}
-                </p>
-
+                <h3>${escapeHtml(item.productName)}</h3>
+                <p>${formatPrice(item.productPrice)}</p>
             </div>
-
         </div>
 
-
         <div class="quantity-control">
-
-            <button
-                type="button"
-                class="quantity-button decrease-button">
-                −
-            </button>
+            <button type="button" class="quantity-button decrease-button">−</button>
 
             <input
                 type="number"
@@ -138,338 +104,225 @@ function createCartItem(item) {
                 step="1"
                 value="${item.quantity}">
 
-            <button
-                type="button"
-                class="quantity-button increase-button">
-                +
-            </button>
-
+            <button type="button" class="quantity-button increase-button">+</button>
         </div>
 
-
         <div class="cart-item-actions">
-
-            <button
-                type="button"
-                class="delete-button">
+            <button type="button" class="delete-button">
                 Remove
             </button>
-
         </div>
     `;
 
+    const quantityInput = container.querySelector(".quantity-input");
+    const decreaseButton = container.querySelector(".decrease-button");
+    const increaseButton = container.querySelector(".increase-button");
+    const deleteButton = container.querySelector(".delete-button");
 
-    const quantityInput =
-        container.querySelector(
-            ".quantity-input"
-        );
+    decreaseButton.addEventListener("click", async () => {
+        const quantity = getQuantity(quantityInput);
 
-    const decreaseButton =
-        container.querySelector(
-            ".decrease-button"
-        );
-
-    const increaseButton =
-        container.querySelector(
-            ".increase-button"
-        );
-
-    const deleteButton =
-        container.querySelector(
-            ".delete-button"
-        );
-
-
-    decreaseButton.addEventListener(
-        "click",
-        async () => {
-
-            const quantity =
-                getQuantity(quantityInput);
-
-            if (quantity <= 1) {
-                return;
-            }
-
-            quantityInput.value =
-                quantity - 1;
-
-            await updateQuantity(
-                item,
-                quantityInput,
-                decreaseButton,
-                increaseButton
-            );
+        if (quantity <= 1) {
+            return;
         }
+
+        quantityInput.value = quantity - 1;
+
+        await updateQuantity(
+            item,
+            quantityInput,
+            decreaseButton,
+            increaseButton
+        );
+    });
+
+    increaseButton.addEventListener("click", async () => {
+        const quantity = getQuantity(quantityInput);
+
+        quantityInput.value = quantity + 1;
+
+        await updateQuantity(
+            item,
+            quantityInput,
+            decreaseButton,
+            increaseButton
+        );
+    });
+
+    quantityInput.addEventListener("blur", async () => {
+        await updateQuantity(
+            item,
+            quantityInput,
+            decreaseButton,
+            increaseButton
+        );
+    });
+
+    deleteButton.addEventListener("click", () =>
+        deleteItem(item, container, deleteButton)
     );
-
-
-    increaseButton.addEventListener(
-        "click",
-        async () => {
-
-            const quantity =
-                getQuantity(quantityInput);
-
-            quantityInput.value =
-                quantity + 1;
-
-            await updateQuantity(
-                item,
-                quantityInput,
-                decreaseButton,
-                increaseButton
-            );
-        }
-    );
-
-
-    quantityInput.addEventListener(
-        "blur",
-        async () => {
-
-            await updateQuantity(
-                item,
-                quantityInput,
-                decreaseButton,
-                increaseButton
-            );
-        }
-    );
-
-
-    deleteButton.addEventListener(
-        "click",
-        () =>
-            deleteItem(
-                item,
-                container,
-                deleteButton
-            )
-    );
-
 
     return container;
 }
 
-
-async function updateQuantity(
-    item,
-    quantityInput,
-    decreaseButton,
-    increaseButton
-) {
-
-    const quantity =
-        getQuantity(quantityInput);
+async function updateQuantity(item, quantityInput, decreaseButton, increaseButton) {
+    const quantity = getQuantity(quantityInput);
 
     quantityInput.disabled = true;
     decreaseButton.disabled = true;
     increaseButton.disabled = true;
 
-
     try {
-
-        const response =
-            await fetch(
-                `${CART_API}/items/${item.id}`,
-                {
-                    method: "PATCH",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        quantity: quantity
-                    })
-                }
-            );
-
+        const response = await fetch(`${CART_API}/items/${item.id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({quantity: quantity})
+        });
 
         if (!response.ok) {
-
-            const message =
-                await response.text();
-
-            throw new Error(
-                message ||
-                "Failed to update cart item."
-            );
+            const message = await response.text();
+            throw new Error(message || "Failed to update cart item.");
         }
 
-
     } catch (error) {
-
         console.error(error);
 
-        alert(
-            error.message ||
-            "Failed to update cart item."
-        );
+        alert(error.message || "Failed to update cart item.");
 
         await loadCart();
 
-        return;
-
     } finally {
-
         quantityInput.disabled = false;
         decreaseButton.disabled = false;
         increaseButton.disabled = false;
     }
 }
 
-
-async function deleteItem(
-    item,
-    itemElement,
-    deleteButton
-) {
-
-    const confirmed =
-        confirm(
-            "Remove this item from your cart?"
-        );
+async function deleteItem(item, itemElement, deleteButton) {
+    const confirmed = confirm("Remove this item from your cart?");
 
     if (!confirmed) {
         return;
     }
 
-
     deleteButton.disabled = true;
-    deleteButton.textContent =
-        "Removing...";
-
+    deleteButton.textContent = "Removing...";
 
     try {
-
-        const response =
-            await fetch(
-                `${CART_API}/items/${item.id}`,
-                {
-                    method: "DELETE"
-                }
-            );
-
+        const response = await fetch(`${CART_API}/items/${item.id}`, {
+            method: "DELETE"
+        });
 
         if (!response.ok) {
-
-            const message =
-                await response.text();
-
-            throw new Error(
-                message ||
-                "Failed to remove cart item."
-            );
+            const message = await response.text();
+            throw new Error(message || "Failed to remove cart item.");
         }
-
 
         itemElement.remove();
 
-
         if (cartItems.children.length === 0) {
-
             cartContent.hidden = true;
             emptyMessage.hidden = false;
             clearCartButton.hidden = true;
+            checkoutButton.hidden = true;
         }
 
-
     } catch (error) {
-
         console.error(error);
 
-        alert(
-            error.message ||
-            "Failed to remove cart item."
-        );
+        alert(error.message || "Failed to remove cart item.");
 
         deleteButton.disabled = false;
-        deleteButton.textContent =
-            "Remove";
+        deleteButton.textContent = "Remove";
     }
 }
 
-
 async function deleteAllItems() {
-
     if (!cartItems.children.length) {
         return;
     }
 
-
-    const confirmed =
-        confirm(
-            "Are you sure you want to remove all items from your cart?"
-        );
+    const confirmed = confirm("Are you sure you want to remove all items from your cart?");
 
     if (!confirmed) {
         return;
     }
 
-
     clearCartButton.disabled = true;
-    clearCartButton.textContent =
-        "Clearing...";
-
+    clearCartButton.textContent = "Clearing...";
 
     try {
-
-        const response =
-            await fetch(
-                `${CART_API}/items`,
-                {
-                    method: "DELETE"
-                }
-            );
-
+        const response = await fetch(`${CART_API}/items`, {
+            method: "DELETE"
+        });
 
         if (!response.ok) {
-
-            const message =
-                await response.text();
-
-            throw new Error(
-                message ||
-                "Failed to clear cart."
-            );
+            const message = await response.text();
+            throw new Error(message || "Failed to clear cart.");
         }
 
-
         cartItems.innerHTML = "";
-
         cartContent.hidden = true;
         emptyMessage.hidden = false;
         clearCartButton.hidden = true;
-
+        checkoutButton.hidden = true;
 
     } catch (error) {
-
         console.error(error);
 
-        alert(
-            error.message ||
-            "Failed to clear cart."
-        );
+        alert(error.message || "Failed to clear cart.");
 
     } finally {
-
         clearCartButton.disabled = false;
-        clearCartButton.textContent =
-            "Clear Cart";
+        clearCartButton.textContent = "Clear Cart";
     }
 }
 
+async function checkout() {
+    checkoutButton.disabled = true;
+    checkoutButton.textContent = "Checking out...";
+
+    try {
+        const authResponse = await fetch(AUTH_API);
+
+        if (authResponse.status === 401) {
+            window.location.href = "/auth/login.html?redirect=/cart/storefront/cart.html?checkout=true";
+            return;
+        }
+
+        if (!authResponse.ok) {
+            throw new Error("Failed to verify authentication.");
+        }
+
+        const response = await fetch(ORDER_API, {
+            method: "POST"
+        });
+
+        if (!response.ok) {
+            const message = await response.text();
+            throw new Error(message || "Failed to create order.");
+        }
+
+        const order = await response.json();
+
+        window.location.href = `/orders/storefront/checkout.html?id=${order.id}`;
+
+    } catch (error) {
+        console.error(error);
+
+        alert(error.message || "Failed to create order.");
+
+        checkoutButton.disabled = false;
+        checkoutButton.textContent = "Checkout";
+    }
+}
 
 function getQuantity(input) {
+    let quantity = parseInt(input.value, 10);
 
-    let quantity =
-        parseInt(input.value, 10);
-
-    if (Number.isNaN(quantity) ||
-        quantity < 1) {
-
+    if (Number.isNaN(quantity) || quantity < 1) {
         quantity = 1;
     }
 
@@ -478,42 +331,26 @@ function getQuantity(input) {
     return quantity;
 }
 
-
 function formatPrice(price) {
-
-    const numericPrice =
-        Number(price);
+    const numericPrice = Number(price);
 
     if (Number.isNaN(numericPrice)) {
         return price;
     }
 
-    return new Intl.NumberFormat(
-        "en-US",
-        {
-            style: "currency",
-            currency: "USD"
-        }
-    ).format(numericPrice);
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+    }).format(numericPrice);
 }
 
-
 function escapeHtml(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value ?? "";
-
+    const div = document.createElement("div");
+    div.textContent = value ?? "";
     return div.innerHTML;
 }
 
-
 function showError(message) {
-
-    errorMessage.textContent =
-        message;
-
+    errorMessage.textContent = message;
     errorMessage.hidden = false;
 }

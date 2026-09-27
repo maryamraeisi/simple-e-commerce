@@ -47,8 +47,12 @@ public class CustomerService {
 
     public CustomerResponse getById(Long id) {
         Customer customer = repository.findById(id).orElseThrow();
-
         return CustomerMapper.toResponse(customer);
+    }
+
+    public Customer getCustomerById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
     }
 
     public List<CustomerResponse> getAll() {

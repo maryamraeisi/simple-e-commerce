@@ -23,19 +23,22 @@ function showLoggedIn(customer) {
     const loggedOut = document.getElementById("logged-out");
     const loggedIn = document.getElementById("logged-in");
     const customerName = document.getElementById("customer-name");
+    const myOrdersLink = document.getElementById("my-orders-link");
+
+    if (myOrdersLink) {
+        myOrdersLink.hidden = !loggedIn;
+    }
 
     if (!loggedOut || !loggedIn || !customerName) {
         return;
     }
 
-    customerName.textContent =
-        `${customer.firstName} ${customer.lastName}`;
+    customerName.textContent = `${customer.firstName} ${customer.lastName}`;
 
     loggedOut.hidden = true;
     loggedIn.hidden = false;
 
-    const logoutButton =
-        document.getElementById("logout-button");
+    const logoutButton = document.getElementById("logout-button");
 
     if (logoutButton) {
         logoutButton.addEventListener("click", logout);

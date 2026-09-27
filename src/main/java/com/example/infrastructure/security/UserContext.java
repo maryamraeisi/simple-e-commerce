@@ -21,6 +21,18 @@ public class UserContext {
         return userDetails.getCustomer();
     }
 
+    public Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                !(authentication.getPrincipal() instanceof AppUserDetails userDetails)) {
+            throw new IllegalStateException("No authenticated user");
+        }
+
+        return userDetails.getCustomer().getId();
+    }
+
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

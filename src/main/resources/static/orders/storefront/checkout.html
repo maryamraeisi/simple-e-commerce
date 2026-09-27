@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My Cart - Simple Shop</title>
+    <title>Checkout - Simple Shop</title>
 
     <link rel="stylesheet" href="/common/common.css">
-    <link rel="stylesheet" href="/cart/storefront/cart.css">
+    <link rel="stylesheet" href="/orders/storefront/checkout.css">
 </head>
 
 <body>
@@ -23,7 +23,7 @@
             Products
         </a>
 
-        <a href="/cart/storefront/cart.html" class="active">
+        <a href="/cart/storefront/cart.html">
             Cart
         </a>
 
@@ -56,7 +56,7 @@
 </header>
 
 
-<main class="cart-container">
+<main class="checkout-container">
 
     <section class="hero">
 
@@ -65,11 +65,11 @@
         </p>
 
         <h1>
-            My Cart
+            Checkout
         </h1>
 
         <p>
-            Review the products you've added to your cart.
+            Review your order before completing your payment.
         </p>
 
     </section>
@@ -77,65 +77,63 @@
 
     <div class="back-link-container">
 
-        <a href="/index.html" class="back-link">
-            ← Continue Shopping
+        <a href="/cart/storefront/cart.html" class="back-link">
+            ← Back to Cart
         </a>
 
     </div>
 
 
-    <section class="cart-section">
-
-        <div class="section-header">
-            <h2>Your Items</h2>
-
-            <button
-                    type="button"
-                    id="clear-cart-button"
-                    class="clear-cart-button">
-                Clear Cart
-            </button>
-        </div>
-
+    <section class="checkout-section">
 
         <div id="loading" class="loading">
-            Loading cart...
+            Loading order...
         </div>
 
 
         <div id="error-message" class="message error" hidden></div>
 
 
-        <div id="empty-message" class="empty-message" hidden>
+        <div id="checkout-content" class="checkout-content" hidden>
 
-            <h3>
-                Your cart is empty
-            </h3>
+            <div class="section-header">
 
-            <p>
-                Add some products to your cart to get started.
-            </p>
+                <h2>
+                    Your Order
+                </h2>
 
-            <a
-                    href="/index.html"
-                    class="continue-shopping-button">
-                Browse Products
-            </a>
+                <span id="order-status" class="order-status"></span>
 
-        </div>
+            </div>
 
 
-        <div id="cart-content" class="cart-content" hidden>
+            <div id="order-items" class="order-items"></div>
 
-            <div id="cart-items"></div>
 
-            <div class="checkout-container">
+            <div class="order-summary">
+
+                <div class="summary-row">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <span id="order-total" class="order-total"></span>
+
+                </div>
+
+            </div>
+
+
+            <div class="payment-container">
+
                 <button
                         type="button"
-                        id="checkout-button"
-                        class="checkout-button">
-                    Checkout
+                        id="pay-button"
+                        class="pay-button">
+                    Pay Now
                 </button>
+
             </div>
 
         </div>
@@ -145,7 +143,7 @@
 </main>
 
 
-<script src="/cart/storefront/cart.js"></script>
+<script src="/orders/storefront/checkout.js"></script>
 <script src="/common/auth.js"></script>
 
 </body>

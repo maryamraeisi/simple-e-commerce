@@ -1,6 +1,5 @@
 package com.example.order.controller;
 
-import com.example.order.dto.CreateOrderRequest;
 import com.example.order.dto.OrderResponse;
 import com.example.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -14,25 +13,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService service;
+    private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
-        return ResponseEntity.ok(service.createOrder(request));
+    public ResponseEntity<OrderResponse> createOrder() {
+        return ResponseEntity.ok(orderService.createOrder());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getOrder(id));
+        return ResponseEntity.ok(orderService.getOrder(id));
     }
 
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
-        return ResponseEntity.ok(service.getAllOrders());
+        return ResponseEntity.ok(orderService.getAllOrders());
     }
 
     @PatchMapping("/{id}/cancel")
     public void cancelOrder(@PathVariable Long id) {
-        service.cancelOrder(id);
+        orderService.cancelOrder(id);
     }
 }

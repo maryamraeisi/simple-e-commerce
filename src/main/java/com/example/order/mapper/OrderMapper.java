@@ -21,6 +21,7 @@ public class OrderMapper {
                         .map(item -> new OrderItemResponse(
                                 item.getProductId(),
                                 item.getProductName(),
+                                item.getProductImageUrl(),
                                 item.getQuantity(),
                                 item.getUnitPrice(),
                                 item.getSubtotal()

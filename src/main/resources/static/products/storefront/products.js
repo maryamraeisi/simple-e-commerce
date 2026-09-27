@@ -75,7 +75,7 @@ function createProductCard(product) {
     const viewButton = document.createElement("a");
     viewButton.className = "view-product-button";
     viewButton.textContent = "View Product";
-    viewButton.href = `/storefront/product-details.html?id=${product.id}`;
+    viewButton.href = `products/storefront/product-details.html?id=${product.id}`;
     footer.appendChild(price);
     footer.appendChild(viewButton);
     content.appendChild(name);
