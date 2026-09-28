@@ -77,7 +77,8 @@ public class PaymentService {
         return PaymentMapper.toResponse(payment, gatewayResponse.paymentUrl());
     }
 
-    public PaymentResponse handleCallback(String authority) {
+    @Transactional
+    public PaymentResponse handleCallback(String authority, String status) {
         PaymentTransaction transaction = paymentTransactionRepository.findByAuthority(authority)
                 .orElseThrow(() -> new IllegalArgumentException("Payment transaction not found."));
 
@@ -87,24 +88,25 @@ public class PaymentService {
             return PaymentMapper.toResponse(payment);
         }
 
+        if ("cancelled".equals(status)) {
+            PaymentResponse paymentResponse = updateFailPayment(transaction, payment);
+            return paymentResponse;
+        }
+
         PaymentGateway gateway = paymentGatewayFactory.getGateway(transaction.getProvider());
+
         PaymentGatewayVerifyResponse verification = gateway.verifyPayment(payment, transaction);
 
         if (!verification.successful()) {
-            transaction.setStatus(PaymentTransactionStatus.FAILED);
-            transaction.setUpdatedAt(LocalDateTime.now());
-
-            payment.setStatus(PaymentStatus.FAILED);
-            payment.setUpdatedAt(LocalDateTime.now());
-
-            paymentTransactionRepository.save(transaction);
-            paymentRepository.save(payment);
-
-            sendPaymentFailedEvent(payment);
-
-            return PaymentMapper.toResponse(payment);
+            PaymentResponse paymentResponse = updateFailPayment(transaction, payment);
+            return paymentResponse;
         }
 
+        PaymentResponse paymentResponse = updateSuccessPayment(transaction, verification, payment);
+        return paymentResponse;
+    }
+
+    private PaymentResponse updateSuccessPayment(PaymentTransaction transaction, PaymentGatewayVerifyResponse verification, Payment payment) {
         transaction.setStatus(PaymentTransactionStatus.SUCCESS);
         transaction.setReferenceId(verification.referenceId());
         transaction.setUpdatedAt(LocalDateTime.now());
@@ -112,17 +114,35 @@ public class PaymentService {
         payment.setStatus(PaymentStatus.COMPLETED);
         payment.setUpdatedAt(LocalDateTime.now());
 
-        orderService.updateOrderStatus(payment.getOrderId(), OrderStatus.PAID);
         Order order = orderService.getOrderById(payment.getOrderId());
+        orderService.updateOrderStatus(order.getId(), OrderStatus.PAID);
 
         cartService.deleteAllItemsForCustomer(order.getCustomer().getId());
 
         paymentTransactionRepository.save(transaction);
         paymentRepository.save(payment);
 
-        sendPaymentCompletedEvent(payment);
+        return PaymentMapper.toResponse(payment);
+    }
+
+    private PaymentResponse updateFailPayment(PaymentTransaction transaction, Payment payment) {
+        transaction.setStatus(PaymentTransactionStatus.FAILED);
+        transaction.setUpdatedAt(LocalDateTime.now());
+
+        payment.setStatus(PaymentStatus.FAILED);
+        payment.setUpdatedAt(LocalDateTime.now());
+
+        paymentTransactionRepository.save(transaction);
+        paymentRepository.save(payment);
 
         return PaymentMapper.toResponse(payment);
+    }
+
+    public PaymentResponse getByAuthority(String authority) {
+        PaymentTransaction transaction = paymentTransactionRepository.findByAuthority(authority)
+                .orElseThrow(() -> new IllegalArgumentException("Payment transaction not found."));
+
+        return PaymentMapper.toResponse(transaction.getPayment());
     }
 
     public PaymentResponse completePayment(Long paymentId) {

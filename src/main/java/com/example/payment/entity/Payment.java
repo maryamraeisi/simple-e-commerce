@@ -28,5 +28,6 @@ public class Payment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<PaymentTransaction> transactions = new ArrayList<>();
 }

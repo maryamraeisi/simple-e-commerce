@@ -1,4 +1,5 @@
 const ORDER_API = "/api/orders";
+const PAYMENT_API = "/api/payments";
 
 const loading = document.getElementById("loading");
 const errorMessage = document.getElementById("error-message");
@@ -45,8 +46,10 @@ async function loadOrder() {
         checkoutContent.hidden = false;
 
         renderOrder(order);
+
     } catch (error) {
         console.error(error);
+
         loading.hidden = true;
         showError(error.message || "Failed to load order. Please try again later.");
     }
@@ -79,16 +82,16 @@ function createOrderItem(item) {
                 ${
         item.productImageUrl
             ? `
-                        <img
-                            src="${item.productImageUrl}"
-                            alt="${escapeHtml(item.productName)}"
-                            class="order-item-image">
-                    `
+                            <img
+                                src="${item.productImageUrl}"
+                                alt="${escapeHtml(item.productName)}"
+                                class="order-item-image">
+                        `
             : `
-                        <div class="order-item-image-placeholder">
-                            No image
-                        </div>
-                    `
+                            <div class="order-item-image-placeholder">
+                                No image
+                            </div>
+                        `
     }
             </div>
 
@@ -120,14 +123,43 @@ async function payOrder() {
     payButton.textContent = "Processing...";
 
     try {
-        /*
-         * Payment API will be connected here.
-         */
-        console.log(`Payment for order ${orderId}`);
+        const response = await fetch(PAYMENT_API, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                orderId: Number(orderId)
+            })
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = `/auth/login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+                return;
+            }
+
+            if (response.status === 400) {
+                const error = await response.json().catch(() => null);
+                throw new Error(error?.message || "Unable to create payment.");
+            }
+
+            throw new Error("Unable to create payment.");
+        }
+
+        const payment = await response.json();
+
+        if (!payment.paymentUrl) {
+            throw new Error("Payment gateway URL was not returned.");
+        }
+
+        window.location.href = payment.paymentUrl;
 
     } catch (error) {
         console.error(error);
-        alert(error.message || "Payment failed.");
+
+        showError(error.message || "Payment could not be started.");
+
         payButton.disabled = false;
         payButton.textContent = "Pay Now";
     }

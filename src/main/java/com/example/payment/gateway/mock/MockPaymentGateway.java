@@ -15,7 +15,7 @@ public class MockPaymentGateway implements PaymentGateway {
     @Override
     public PaymentGatewayCreateResponse createPayment(Payment payment, PaymentTransaction transaction) {
         String authority = UUID.randomUUID().toString();
-        String paymentUrl = "/mock-ipg/payment?authority=" + authority;
+        String paymentUrl = "/payment/storefront/mock-ipg/payment.html?authority=" + authority;
         return new PaymentGatewayCreateResponse(authority, paymentUrl);
     }
 

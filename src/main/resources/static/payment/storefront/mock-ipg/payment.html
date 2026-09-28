@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Payment Gateway</title>
+    <link rel="stylesheet" href="/payment/storefront/mock-ipg/payment.css">
+</head>
+<body>
+
+<div class="payment-container">
+
+    <div class="payment-card">
+
+        <div class="payment-header">
+            <h1>Mock Payment Gateway</h1>
+            <p>Test Payment Environment</p>
+        </div>
+
+        <div id="loading" class="loading">
+            Loading payment...
+        </div>
+
+        <div id="payment-content" hidden>
+
+            <div class="payment-info">
+                <div class="info-row">
+                    <span>Amount</span>
+                    <strong id="payment-amount"></strong>
+                </div>
+
+                <div class="info-row">
+                    <span>Authority</span>
+                    <span id="payment-authority"></span>
+                </div>
+            </div>
+
+            <div class="payment-actions">
+                <button id="pay-button" class="pay-button">
+                    Pay
+                </button>
+
+                <button id="cancel-button" class="cancel-button">
+                    Cancel
+                </button>
+            </div>
+
+        </div>
+
+        <div id="error-message" class="error-message" hidden></div>
+
+    </div>
+
+</div>
+
+<script src="/payment/storefront/mock-ipg/payment.js"></script>
+</body>
+</html>

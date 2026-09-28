@@ -57,6 +57,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/signup").permitAll()
                         .requestMatchers("/api/auth/me").authenticated()
                         .requestMatchers("/api/cart/**").permitAll()
+                        .requestMatchers("/mock-ipg/**").permitAll()
+                        .requestMatchers("/api/payments/callback").permitAll()
+                        .requestMatchers("/api/payments/authority/**").permitAll()
 
                         // Public frontend
                         .requestMatchers(
@@ -70,7 +73,8 @@ public class SecurityConfig {
                                 "/products/**",
                                 "/inventory/**",
                                 "/orders/**",
-                                "/cart/**"
+                                "/cart/**",
+                                "/payment/storefront/mock-ipg/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .anyRequest()

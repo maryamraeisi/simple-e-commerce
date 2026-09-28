@@ -20,8 +20,13 @@ public class PaymentController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<PaymentResponse> callback(@RequestParam String authority) {
-        return ResponseEntity.ok(paymentService.handleCallback(authority));
+    public ResponseEntity<PaymentResponse> callback(@RequestParam String authority, @RequestParam String status) {
+        return ResponseEntity.ok(paymentService.handleCallback(authority, status));
+    }
+
+    @GetMapping("/authority/{authority}")
+    public ResponseEntity<PaymentResponse> getByAuthority(@PathVariable String authority) {
+        return ResponseEntity.ok(paymentService.getByAuthority(authority));
     }
 
     @GetMapping("/{id}")
