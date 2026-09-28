@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
@@ -21,19 +19,9 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.createPayment(request));
     }
 
-    @PostMapping("/{id}/complete")
-    public ResponseEntity<PaymentResponse> completePayment(@PathVariable Long id) {
-        return ResponseEntity.ok(paymentService.completePayment(id));
-    }
-
-    @PostMapping("/{id}/fail")
-    public ResponseEntity<PaymentResponse> failPayment(@PathVariable Long id) {
-        return ResponseEntity.ok(paymentService.failPayment(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<PaymentResponse>> getAllPayments() {
-        return ResponseEntity.ok(paymentService.getAll());
+    @GetMapping("/callback")
+    public ResponseEntity<PaymentResponse> callback(@RequestParam String authority) {
+        return ResponseEntity.ok(paymentService.handleCallback(authority));
     }
 
     @GetMapping("/{id}")

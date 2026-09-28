@@ -12,7 +12,18 @@ public class PaymentMapper {
                 payment.getId(),
                 payment.getOrderId(),
                 payment.getAmount(),
-                payment.getStatus()
+                payment.getStatus(),
+                null
+        );
+    }
+
+    public static PaymentResponse toResponse(Payment payment, String paymentUrl) {
+        return new PaymentResponse(
+                payment.getId(),
+                payment.getOrderId(),
+                payment.getAmount(),
+                payment.getStatus(),
+                paymentUrl
         );
     }
 }

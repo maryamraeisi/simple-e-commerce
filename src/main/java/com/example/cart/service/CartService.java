@@ -68,6 +68,17 @@ public class CartService {
         cartRepository.save(currentCart);
     }
 
+    @Transactional
+    public void deleteAllItemsForCustomer(Long customerId) {
+        Optional<Cart> customerCartOptional = cartRepository.findByCustomerId(customerId);
+
+        if (customerCartOptional.isPresent()) {
+            Cart customerCart = customerCartOptional.get();
+            customerCart.getCartItems().clear();
+            cartRepository.save(customerCart);
+        }
+    }
+
     public CartResponse getUserCart(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         Cart currentCart = getCurrentCart(httpRequest, httpResponse);
         return CartMapper.toResponse(currentCart);

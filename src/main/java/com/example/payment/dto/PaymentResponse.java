@@ -8,5 +8,6 @@ public record PaymentResponse(
         Long id,
         Long orderId,
         BigDecimal amount,
-        PaymentStatus status
+        PaymentStatus status,
+        String paymentUrl
 ) {}
