@@ -2,16 +2,21 @@ package com.example.payment.controller;
 
 import com.example.payment.dto.CreatePaymentRequest;
 import com.example.payment.dto.PaymentResponse;
+import com.example.payment.gateway.mock.MockPaymentResult;
 import com.example.payment.service.PaymentService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
 public class PaymentController {
 
+    private final String CHECKOUT_URL = "/orders/storefront/checkout.html";
     private final PaymentService paymentService;
 
     @PostMapping
@@ -20,13 +25,11 @@ public class PaymentController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<PaymentResponse> callback(@RequestParam String authority, @RequestParam String status) {
-        return ResponseEntity.ok(paymentService.handleCallback(authority, status));
-    }
-
-    @GetMapping("/authority/{authority}")
-    public ResponseEntity<PaymentResponse> getByAuthority(@PathVariable String authority) {
-        return ResponseEntity.ok(paymentService.getByAuthority(authority));
+    public void callback(@RequestParam String authority, @RequestParam MockPaymentResult status,
+            HttpServletResponse response) throws IOException {
+        PaymentResponse payment = paymentService.handleCallback(authority, status);
+        String redirectUrl = CHECKOUT_URL + "?id=" + payment.orderId();
+        response.sendRedirect(redirectUrl);
     }
 
     @GetMapping("/{id}")

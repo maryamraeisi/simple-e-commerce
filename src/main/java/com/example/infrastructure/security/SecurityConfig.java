@@ -59,7 +59,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers("/mock-ipg/**").permitAll()
                         .requestMatchers("/api/payments/callback").permitAll()
-                        .requestMatchers("/api/payments/authority/**").permitAll()
 
                         // Public frontend
                         .requestMatchers(

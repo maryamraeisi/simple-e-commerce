@@ -3,56 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mock Payment Gateway</title>
+
+    <title>Secure Payment - SimplePay</title>
+
     <link rel="stylesheet" href="/payment/storefront/mock-ipg/payment.css">
 </head>
+
 <body>
 
-<div class="payment-container">
+<div class="page">
 
-    <div class="payment-card">
+    <header class="gateway-header">
 
-        <div class="payment-header">
-            <h1>Mock Payment Gateway</h1>
-            <p>Test Payment Environment</p>
-        </div>
-
-        <div id="loading" class="loading">
-            Loading payment...
-        </div>
-
-        <div id="payment-content" hidden>
-
-            <div class="payment-info">
-                <div class="info-row">
-                    <span>Amount</span>
-                    <strong id="payment-amount"></strong>
-                </div>
-
-                <div class="info-row">
-                    <span>Authority</span>
-                    <span id="payment-authority"></span>
-                </div>
+        <div class="gateway-brand">
+            <div class="brand-icon">
+                $
             </div>
 
-            <div class="payment-actions">
-                <button id="pay-button" class="pay-button">
-                    Pay
-                </button>
+            <div>
+                <div class="brand-name">
+                    SimplePay
+                </div>
 
-                <button id="cancel-button" class="cancel-button">
-                    Cancel
-                </button>
+                <div class="brand-subtitle">
+                    Secure Payment Gateway
+                </div>
             </div>
+        </div>
+
+        <div class="test-badge">
+            TEST ENVIRONMENT
+        </div>
+
+    </header>
+
+
+    <main class="payment-wrapper">
+
+        <section class="payment-card">
+
+            <div class="merchant-section">
+
+                <div class="merchant-icon">
+                    S
+                </div>
+
+                <div class="merchant-info">
+                    <span class="merchant-label">
+                        Paying to
+                    </span>
+
+                    <strong>
+                        Simple Shop
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="amount-section">
+
+                <span class="amount-label">
+                    Amount to pay
+                </span>
+
+                <div id="payment-amount" class="amount">
+                    --
+                </div>
+
+            </div>
+
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                Loading payment...
+            </div>
+
+
+            <div id="payment-content" hidden>
+
+                <div class="security-message">
+
+                    <span class="security-icon">
+                        ✓
+                    </span>
+
+                    <span>
+                        Your payment is processed securely.
+                    </span>
+
+                </div>
+
+
+                <form id="payment-form">
+
+                    <div class="form-section">
+
+                        <h2>
+                            Card Information
+                        </h2>
+
+
+                        <div class="form-group">
+
+                            <label for="card-number">
+                                Card number
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <span class="input-icon">
+                                    ▣
+                                </span>
+
+                                <input
+                                        type="text"
+                                        id="card-number"
+                                        placeholder="1234 5678 9012 3456"
+                                        maxlength="19"
+                                        autocomplete="cc-number"
+                                        inputmode="numeric"
+                                        required>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+
+                                <label for="expiry">
+                                    Expiry date
+                                </label>
+
+                                <input
+                                        type="text"
+                                        id="expiry"
+                                        placeholder="MM / YY"
+                                        maxlength="7"
+                                        autocomplete="cc-exp"
+                                        inputmode="numeric"
+                                        required>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="cvv">
+                                    CVV
+                                </label>
+
+                                <input
+                                        type="password"
+                                        id="cvv"
+                                        placeholder="•••"
+                                        maxlength="4"
+                                        autocomplete="cc-csc"
+                                        inputmode="numeric"
+                                        required>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="cardholder-name">
+                                Cardholder name
+                            </label>
+
+                            <input
+                                    type="text"
+                                    id="cardholder-name"
+                                    placeholder="Name on card"
+                                    autocomplete="cc-name"
+                                    required>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="error-message" class="error-message" hidden></div>
+
+
+                    <div class="payment-actions">
+
+                        <button
+                                type="submit"
+                                id="pay-button"
+                                class="pay-button">
+
+                            <span>
+                                Pay
+                            </span>
+
+                            <span id="pay-amount">
+                                --
+                            </span>
+
+                        </button>
+
+
+                        <button
+                                type="button"
+                                id="cancel-button"
+                                class="cancel-button">
+
+                            Cancel payment
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <div class="footer-security">
+
+            <span>
+                🔒
+            </span>
+
+            <span>
+                Secure connection
+            </span>
+
+            <span class="separator">
+                •
+            </span>
+
+            <span>
+                SimplePay Test Gateway
+            </span>
 
         </div>
 
-        <div id="error-message" class="error-message" hidden></div>
-
-    </div>
+    </main>
 
 </div>
 
+
 <script src="/payment/storefront/mock-ipg/payment.js"></script>
+
 </body>
 </html>
