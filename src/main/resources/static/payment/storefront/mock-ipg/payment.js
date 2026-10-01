@@ -63,11 +63,11 @@ async function loadPayment() {
             throw new Error("Payment not found.");
         }
 
-        const payment = await response.json();
+        const amount = await response.json();
 
-        console.log("Payment data:", payment);
+        console.log("Payment amount:", amount);
 
-        const formattedAmount = formatPrice(payment.amount);
+        const formattedAmount = formatPrice(amount);
 
         paymentAmount.textContent = formattedAmount;
         payAmount.textContent = formattedAmount;

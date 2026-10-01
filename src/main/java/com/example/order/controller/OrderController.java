@@ -26,8 +26,8 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+    public ResponseEntity<List<OrderResponse>> getCurrentCustomerOrders() {
+        return ResponseEntity.ok(orderService.getCurrentCustomerOrders());
     }
 
     @PatchMapping("/{id}/cancel")

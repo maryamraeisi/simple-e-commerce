@@ -60,11 +60,27 @@ public class OrderService {
     }
 
     public OrderResponse getOrder(Long id) {
-        return orderRepository.findById(id).map(OrderMapper::toResponse).orElseThrow();
+        Long customerId = userContext.getCurrentUserId();
+
+        return orderRepository
+                .findById(id)
+                .filter(order -> order.getCustomer().getId().equals(customerId))
+                .map(OrderMapper::toResponse)
+                .orElseThrow(() -> new IllegalArgumentException("You do not have an order with id: " + id));
     }
 
     public Order getOrderById(Long id) {
         return orderRepository.findById(id).orElseThrow();
+    }
+
+    public List<OrderResponse> getCurrentCustomerOrders() {
+        Long customerId = userContext.getCurrentUserId();
+
+        return orderRepository
+                .findByCustomerId(customerId)
+                .stream()
+                .map(OrderMapper::toResponse)
+                .toList();
     }
 
     public List<OrderResponse> getAllOrders() {
@@ -76,7 +92,11 @@ public class OrderService {
     }
 
     public void cancelOrder(Long id) {
-        Order order = orderRepository.findById(id).orElseThrow();
+        Long customerId = userContext.getCurrentUserId();
+
+        Order order = orderRepository.findById(id)
+                .filter(o -> o.getCustomer().getId().equals(customerId))
+                .orElseThrow(() -> new IllegalArgumentException("You do not have an order with id: " + id));
 
         order.setStatus(OrderStatus.CANCELLED);
 

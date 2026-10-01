@@ -26,7 +26,7 @@ function showLoggedIn(customer) {
     const myOrdersLink = document.getElementById("my-orders-link");
 
     if (myOrdersLink) {
-        myOrdersLink.hidden = !loggedIn;
+        myOrdersLink.hidden = false;
     }
 
     if (!loggedOut || !loggedIn || !customerName) {
@@ -46,11 +46,13 @@ function showLoggedIn(customer) {
 }
 
 function showLoggedOut() {
-    const loggedOut =
-        document.getElementById("logged-out");
+    const loggedOut = document.getElementById("logged-out");
+    const loggedIn = document.getElementById("logged-in");
+    const myOrdersLink = document.getElementById("my-orders-link");
 
-    const loggedIn =
-        document.getElementById("logged-in");
+    if (myOrdersLink) {
+        myOrdersLink.hidden = true;
+    }
 
     if (!loggedOut || !loggedIn) {
         return;

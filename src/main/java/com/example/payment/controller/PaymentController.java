@@ -16,7 +16,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final String CHECKOUT_URL = "/orders/storefront/checkout.html";
+    private final String ORDER_DETAILS_URL = "/orders/storefront/order-details.html";
     private final PaymentService paymentService;
 
     @PostMapping
@@ -28,7 +28,7 @@ public class PaymentController {
     public void callback(@RequestParam String authority, @RequestParam MockPaymentResult status,
             HttpServletResponse response) throws IOException {
         PaymentResponse payment = paymentService.handleCallback(authority, status);
-        String redirectUrl = CHECKOUT_URL + "?id=" + payment.orderId();
+        String redirectUrl = ORDER_DETAILS_URL + "?id=" + payment.orderId();
         response.sendRedirect(redirectUrl);
     }
 
