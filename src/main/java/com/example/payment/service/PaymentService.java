@@ -89,7 +89,6 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("Payment transaction not found."));
 
         Payment payment = transaction.getPayment();
-
         if (transaction.getStatus() == PaymentTransactionStatus.SUCCESS) {
             return PaymentMapper.toResponse(payment);
         }
@@ -100,21 +99,30 @@ public class PaymentService {
             return paymentResponse;
         }
 
+        if (MockPaymentResult.SUCCESS.equals(status)) {
+            PaymentGatewayVerifyResponse verification = verifyPayment(transaction, payment);
+
+            if (!verification.successful()) {
+                PaymentResponse paymentResponse = updateFailPayment(transaction, payment);
+                sendPaymentFailedEvent(payment);
+                return paymentResponse;
+            }
+
+            PaymentResponse paymentResponse = updateSuccessPayment(transaction, verification, payment);
+            sendPaymentCompletedEvent(payment);
+            return paymentResponse;
+        }
+
+        throw new IllegalArgumentException("Unknown result status.");
+    }
+
+    private PaymentGatewayVerifyResponse verifyPayment(PaymentTransaction transaction, Payment payment) {
         PaymentGateway gateway = paymentGatewayFactory.getGateway(transaction.getProvider());
 
         PaymentGatewayVerifyRequest paymentGatewayVerifyRequest =
                 new PaymentGatewayVerifyRequest(payment.getAmount(), transaction.getAuthority());
         PaymentGatewayVerifyResponse verification = gateway.verifyPayment(paymentGatewayVerifyRequest);
-
-        if (!verification.successful()) {
-            PaymentResponse paymentResponse = updateFailPayment(transaction, payment);
-            sendPaymentFailedEvent(payment);
-            return paymentResponse;
-        }
-
-        PaymentResponse paymentResponse = updateSuccessPayment(transaction, verification, payment);
-        sendPaymentCompletedEvent(payment);
-        return paymentResponse;
+        return verification;
     }
 
     private PaymentResponse updateSuccessPayment(PaymentTransaction transaction,

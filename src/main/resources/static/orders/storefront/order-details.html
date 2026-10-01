@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order Details - Simple Shop</title>
+
+    <link rel="stylesheet" href="/orders/storefront/order-details.css">
+</head>
+
+<body>
+
+<header class="store-header">
+
+    <a href="/index.html" class="logo">
+        Simple Shop
+    </a>
+
+    <nav class="main-nav">
+
+        <a href="/index.html">
+            Products
+        </a>
+
+        <a href="/cart/storefront/cart.html">
+            Cart
+        </a>
+
+        <a
+                href="/orders/storefront/orders.html"
+                class="active"
+                id="my-orders-link">
+            My Orders
+        </a>
+
+    </nav>
+
+    <div class="auth-area">
+
+        <div id="logged-out" class="auth-state" hidden>
+            <a href="/auth/login.html" class="login-button">
+                Login
+            </a>
+        </div>
+
+        <div id="logged-in" class="auth-state" hidden>
+
+            <span id="customer-name"></span>
+
+            <button
+                    type="button"
+                    id="logout-button"
+                    class="logout-button">
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="order-details-page">
+
+    <div class="back-link-container">
+
+        <a
+                href="/orders/storefront/orders.html"
+                class="back-link">
+            ← Back to My Orders
+        </a>
+
+    </div>
+
+
+    <!-- Loading -->
+    <section id="loading" class="state-message">
+
+        <div class="spinner"></div>
+
+        <p>
+            Loading order details...
+        </p>
+
+    </section>
+
+
+    <!-- Login Required -->
+    <section id="login-required" class="state-message hidden">
+
+        <div class="state-icon">🔐</div>
+
+        <h2>Sign in to view this order</h2>
+
+        <p>
+            You need to be logged in to view your order details.
+        </p>
+
+        <a
+                href="/auth/login.html"
+                class="primary-button">
+            Sign In
+        </a>
+
+    </section>
+
+
+    <!-- Error -->
+    <section
+            id="error-message"
+            class="state-message error hidden">
+
+        <div class="state-icon">⚠️</div>
+
+        <h2>Unable to load order</h2>
+
+        <p id="error-text">
+            We couldn't load this order.
+        </p>
+
+        <button
+                type="button"
+                id="retry-button"
+                class="primary-button">
+            Try Again
+        </button>
+
+    </section>
+
+
+    <!-- Order Details -->
+    <section
+            id="order-details"
+            class="hidden">
+
+        <div class="page-heading">
+
+            <div>
+                <p class="page-label">ORDER</p>
+
+                <h1 id="order-number">
+                    Order
+                </h1>
+
+                <p
+                        id="order-date"
+                        class="order-date">
+                </p>
+            </div>
+
+            <span
+                    id="order-status"
+                    class="order-status">
+            </span>
+
+        </div>
+
+
+        <div class="details-grid">
+
+            <!-- Items -->
+            <section class="details-card items-card">
+
+                <div class="card-header">
+
+                    <h2>Items</h2>
+
+                </div>
+
+                <div
+                        id="order-items"
+                        class="order-items">
+                </div>
+
+            </section>
+
+
+            <!-- Summary -->
+            <section class="details-card summary-card">
+
+                <div class="card-header">
+
+                    <h2>Order Summary</h2>
+
+                </div>
+
+                <div class="summary-content">
+
+                    <div class="summary-row">
+
+                        <span>
+                            Items
+                        </span>
+
+                        <span id="items-count">
+                            0
+                        </span>
+
+                    </div>
+
+                    <div class="summary-row total-row">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong id="order-total">
+                            0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <div class="order-actions">
+
+            <a
+                    href="/orders/storefront/orders.html"
+                    class="secondary-button">
+                Back to My Orders
+            </a>
+
+            <a
+                    href="/index.html"
+                    class="primary-button">
+                Continue Shopping
+            </a>
+
+            <button
+                    type="button"
+                    id="cancel-order-button"
+                    class="danger-button hidden">
+                Cancel Order
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="/orders/storefront/order-details.js"></script>
+<script src="/common/auth.js"></script>
+
+</body>
+</html>
