@@ -1,8 +1,7 @@
 package com.example.payment.service;
 
 import com.example.cart.service.CartService;
-import com.example.infrastructure.messaging.constants.RabbitMQExchange;
-import com.example.infrastructure.messaging.constants.RabbitMQRoutingKey;
+import com.example.inventory.service.InventoryService;
 import com.example.order.entity.Order;
 import com.example.order.enums.OrderStatus;
 import com.example.order.service.OrderService;
@@ -13,9 +12,6 @@ import com.example.payment.entity.PaymentTransaction;
 import com.example.payment.enums.PaymentStatus;
 import com.example.payment.enums.PaymentProvider;
 import com.example.payment.enums.PaymentTransactionStatus;
-import com.example.payment.event.PaymentCompletedEvent;
-import com.example.payment.event.PaymentCreatedEvent;
-import com.example.payment.event.PaymentFailedEvent;
 import com.example.payment.gateway.PaymentGatewayFactory;
 import com.example.payment.gateway.PaymentGateway;
 import com.example.payment.gateway.mock.MockPaymentResult;
@@ -28,7 +24,6 @@ import com.example.payment.repository.PaymentRepository;
 import com.example.payment.repository.PaymentTransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,9 +36,9 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
-    private final RabbitTemplate rabbitTemplate;
     private final OrderService orderService;
     private final CartService cartService;
+    private final InventoryService inventoryService;
     private final PaymentGatewayFactory paymentGatewayFactory;
     private final PaymentProvider provider = PaymentProvider.MOCK;
     private final String CALLBACK_URL = "/api/payments/callback";
@@ -55,11 +50,16 @@ public class PaymentService {
             throw new IllegalStateException("Order can not be paid.");
         }
 
-        Payment payment = paymentRepository.findByOrderId(order.getId())
-                .orElseGet(() -> createNewPayment(order));
+        Payment payment = paymentRepository.findByOrderId(order.getId()).orElse(null);
 
-        if (payment.getStatus() == PaymentStatus.COMPLETED) {
-            throw new IllegalStateException("Order has already been paid.");
+        if (payment != null) {
+            validatePaymentStatus(payment);
+        }
+
+        inventoryService.reserveStock(order.getId());
+
+        if (payment == null) {
+            payment = createNewPayment(order);
         }
 
         PaymentTransaction transaction = createNewTransaction(payment, provider);
@@ -78,12 +78,9 @@ public class PaymentService {
         payment.setUpdatedAt(LocalDateTime.now());
         paymentRepository.save(payment);
 
-        sendPaymentCreatedEvent(payment);
-
         return PaymentMapper.toResponse(payment, gatewayResponse.paymentUrl());
     }
 
-    @Transactional
     public PaymentResponse handleCallback(String authority, MockPaymentResult status) {
         PaymentTransaction transaction = paymentTransactionRepository.findByAuthority(authority)
                 .orElseThrow(() -> new IllegalArgumentException("Payment transaction not found."));
@@ -94,26 +91,30 @@ public class PaymentService {
         }
 
         if (MockPaymentResult.CANCELLED.equals(status)) {
-            PaymentResponse paymentResponse = updateFailPayment(transaction, payment);
-            sendPaymentFailedEvent(payment);
-            return paymentResponse;
+            return updateFailPayment(transaction, payment);
         }
 
         if (MockPaymentResult.SUCCESS.equals(status)) {
             PaymentGatewayVerifyResponse verification = verifyPayment(transaction, payment);
 
             if (!verification.successful()) {
-                PaymentResponse paymentResponse = updateFailPayment(transaction, payment);
-                sendPaymentFailedEvent(payment);
-                return paymentResponse;
+                return updateFailPayment(transaction, payment);
             }
 
-            PaymentResponse paymentResponse = updateSuccessPayment(transaction, verification, payment);
-            sendPaymentCompletedEvent(payment);
-            return paymentResponse;
+            return updateSuccessPayment(transaction, verification, payment);
         }
 
         throw new IllegalArgumentException("Unknown result status.");
+    }
+
+    private void validatePaymentStatus(Payment payment) {
+        if (payment.getStatus() == PaymentStatus.COMPLETED) {
+            throw new IllegalStateException("Order has already been paid.");
+        }
+
+        if (payment.getStatus() == PaymentStatus.PENDING) {
+            throw new IllegalStateException("A payment is already in progress for this order.");
+        }
     }
 
     private PaymentGatewayVerifyResponse verifyPayment(PaymentTransaction transaction, Payment payment) {
@@ -128,6 +129,8 @@ public class PaymentService {
     private PaymentResponse updateSuccessPayment(PaymentTransaction transaction,
                                                  PaymentGatewayVerifyResponse verification,
                                                  Payment payment) {
+        inventoryService.confirmReservation(payment.getOrderId());
+
         transaction.setStatus(PaymentTransactionStatus.SUCCESS);
         transaction.setReferenceId(verification.referenceId());
         transaction.setUpdatedAt(LocalDateTime.now());
@@ -147,6 +150,8 @@ public class PaymentService {
     }
 
     private PaymentResponse updateFailPayment(PaymentTransaction transaction, Payment payment) {
+        inventoryService.releaseStock(payment.getOrderId());
+
         transaction.setStatus(PaymentTransactionStatus.FAILED);
         transaction.setUpdatedAt(LocalDateTime.now());
 
@@ -189,27 +194,6 @@ public class PaymentService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-    }
-
-    private void sendPaymentFailedEvent(Payment payment) {
-        PaymentFailedEvent event = new PaymentFailedEvent(payment.getId(),
-                payment.getOrderId(),
-                payment.getAmount());
-
-        rabbitTemplate.convertAndSend(RabbitMQExchange.EXCHANGE, RabbitMQRoutingKey.PAYMENT_FAILED, event);
-    }
-
-    private void sendPaymentCompletedEvent(Payment payment) {
-        PaymentCompletedEvent event = new PaymentCompletedEvent(payment.getOrderId());
-        rabbitTemplate.convertAndSend(RabbitMQExchange.EXCHANGE, RabbitMQRoutingKey.PAYMENT_COMPLETED, event);
-    }
-
-    private void sendPaymentCreatedEvent(Payment payment) {
-        PaymentCreatedEvent event = new PaymentCreatedEvent(payment.getId(),
-                payment.getOrderId(),
-                payment.getAmount());
-
-        rabbitTemplate.convertAndSend(RabbitMQExchange.EXCHANGE, RabbitMQRoutingKey.PAYMENT_CREATED, event);
     }
 
 }

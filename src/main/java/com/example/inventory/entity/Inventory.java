@@ -18,17 +18,12 @@ public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private Integer quantity;
-
-    private Integer reservedQuantity;
-
+    private Integer atStock;
+    private Integer available;
+    private Integer reserved;
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
-
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false,
-            unique = true)
+    @JoinColumn(name = "product_id", nullable = false, unique = true)
     private Product product;
 }

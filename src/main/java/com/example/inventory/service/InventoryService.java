@@ -7,8 +7,6 @@ import com.example.inventory.repository.InventoryRepository;
 import com.example.order.entity.Order;
 import com.example.order.entity.OrderItem;
 import com.example.order.service.OrderService;
-import com.example.product.entity.Product;
-import com.example.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,112 +32,107 @@ public class InventoryService {
         List<InventoryResponse> inventoryResponseList = new LinkedList<>();
         List<Inventory> inventoryList = inventoryRepository.findAllWithProduct();
         for (Inventory inventory : inventoryList) {
-            InventoryResponse inventoryResponse = InventoryMapper.toResponse(inventory, inventory.getProduct().getName());
+            InventoryResponse inventoryResponse =
+                    InventoryMapper.toResponse(inventory, inventory.getProduct().getName());
             inventoryResponseList.add(inventoryResponse);
         }
         return inventoryResponseList;
     }
 
-    public InventoryResponse addStock(Long productId, Integer quantity) {
-        Inventory inventory = getInventory(productId);
-
-        if (inventory == null) {
-            throw new IllegalArgumentException("Inventory does not exist for product: " + productId);
+    public InventoryResponse updateStock(Long productId, Integer quantityChange) {
+        if (quantityChange == null || quantityChange == 0) {
+            throw new IllegalArgumentException("Stock quantityChange must not be null or zero");
         }
 
-        inventory.setQuantity(inventory.getQuantity() + quantity);
+        Inventory inventory = getInventoryForUpdate(productId);
+        int newAtStock = inventory.getAtStock() + quantityChange;
+        int newAvailable = inventory.getAvailable() + quantityChange;
 
+        if (newAvailable < 0) {
+            throw new IllegalArgumentException("Cannot reduce stock below the currently reserved stock");
+        }
+
+        inventory.setAtStock(newAtStock);
+        inventory.setAvailable(newAvailable);
+        inventory.setUpdatedAt(LocalDateTime.now());
         return InventoryMapper.toResponse(inventoryRepository.save(inventory));
     }
 
-    public List<InventoryResponse> reserveStock(Long orderId) {
+    public void reserveStock(Long orderId) {
         Order order = orderService.getOrderById(orderId);
-
-        List<InventoryResponse> inventoryResponses = new LinkedList<>();
-
         for (OrderItem item : order.getItems()) {
-            Inventory updated = reserveOrderItems(item);
-            inventoryResponses.add(InventoryMapper.toResponse(updated));
+            reserveOrderItem(item);
         }
-
-        return inventoryResponses;
     }
 
-    private Inventory reserveOrderItems(OrderItem item) {
+    private void reserveOrderItem(OrderItem item) {
         Long productId = item.getProductId();
         Integer quantity = item.getQuantity();
+        Inventory inventory = getInventoryForUpdate(productId);
 
-        Inventory inventory = getInventory(productId);
-
-        int availableStock = inventory.getQuantity() - inventory.getReservedQuantity();
-
-        if (availableStock < quantity) {
+        if (inventory.getAvailable() < quantity) {
             throw new IllegalStateException("Not enough stock for product: " + productId);
         }
 
-        inventory.setQuantity(inventory.getQuantity());
-        inventory.setReservedQuantity(inventory.getReservedQuantity() + quantity);
+        inventory.setAvailable(inventory.getAvailable() - quantity);
+        inventory.setReserved(inventory.getReserved() + quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
-
         inventoryRepository.save(inventory);
-
-        return inventory;
     }
 
-    public List<InventoryResponse> releaseStock(Long orderId) {
+    public void releaseStock(Long orderId) {
         Order order = orderService.getOrderById(orderId);
-
-        List<InventoryResponse> inventoryResponses = new LinkedList<>();
-
         for (OrderItem item : order.getItems()) {
-            Inventory updated = releaseOrderItems(item);
-            inventoryResponses.add(InventoryMapper.toResponse(updated));
+            releaseOrderItem(item);
         }
-        return inventoryResponses;
     }
 
-    private Inventory releaseOrderItems(OrderItem item) {
+    private void releaseOrderItem(OrderItem item) {
         Long productId = item.getProductId();
         Integer quantity = item.getQuantity();
+        Inventory inventory = getInventoryForUpdate(productId);
 
-        Inventory inventory = getInventory(productId);
-
-        if (inventory.getReservedQuantity() < quantity) {
+        if (inventory.getReserved() < quantity) {
             throw new IllegalStateException("Cannot release more stock than reserved");
         }
 
-        inventory.setQuantity(inventory.getQuantity());
-        inventory.setReservedQuantity(inventory.getReservedQuantity() - quantity);
+        inventory.setReserved(inventory.getReserved() - quantity);
+        inventory.setAvailable(inventory.getAvailable() + quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
-
         inventoryRepository.save(inventory);
-
-        return inventory;
     }
 
-    private Inventory getInventory(Long productId) {
-        return inventoryRepository.findByProductId(productId).orElse(null);
-    }
-
-    public void purchaseConfirmed(Long orderId) {
+    public void confirmReservation(Long orderId) {
         Order order = orderService.getOrderById(orderId);
-
         for (OrderItem item : order.getItems()) {
-            purchaseConfirmedForOrderItems(item);
+            confirmOrderItem(item);
         }
     }
 
-    private void purchaseConfirmedForOrderItems(OrderItem item) {
+    private void confirmOrderItem(OrderItem item) {
         Long productId = item.getProductId();
         Integer quantity = item.getQuantity();
+        Inventory inventory = getInventoryForUpdate(productId);
 
-        Inventory inventory = getInventory(productId);
+        if (inventory.getReserved() < quantity) {
+            throw new IllegalStateException("Cannot confirm more stock than reserved");
+        }
 
-        inventory.setQuantity(inventory.getQuantity() - quantity);
-        inventory.setReservedQuantity(inventory.getReservedQuantity() + quantity);
+        inventory.setAtStock(inventory.getAtStock() - quantity);
+        inventory.setReserved(inventory.getReserved() - quantity);
         inventory.setUpdatedAt(LocalDateTime.now());
-
         inventoryRepository.save(inventory);
     }
 
+    private Inventory getInventory(Long productId) {
+        return inventoryRepository.findByProductId(productId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Inventory does not exist for product: " + productId));
+    }
+
+    private Inventory getInventoryForUpdate(Long productId) {
+        return inventoryRepository.findByProductIdForUpdate(productId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Inventory does not exist for product: " + productId));
+    }
 }

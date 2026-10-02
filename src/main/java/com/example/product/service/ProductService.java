@@ -90,8 +90,9 @@ public class ProductService {
     private Inventory createNewInventory(Product product) {
         return Inventory.builder()
                 .product(product)
-                .quantity(0)
-                .reservedQuantity(0)
+                .atStock(0)
+                .available(0)
+                .reserved(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

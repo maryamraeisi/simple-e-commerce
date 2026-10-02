@@ -4,6 +4,7 @@ public record InventoryResponse(
         Long id,
         Long productId,
         String productName,
-        Integer quantity,
-        Integer reservedQuantity
+        Integer atStock,
+        Integer available,
+        Integer reserved
 ) {}

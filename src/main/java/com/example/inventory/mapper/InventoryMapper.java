@@ -12,8 +12,9 @@ public class InventoryMapper {
                 inventory.getId(),
                 inventory.getProduct().getId(),
                 null,
-                inventory.getQuantity(),
-                inventory.getReservedQuantity()
+                inventory.getAtStock(),
+                inventory.getAvailable(),
+                inventory.getReserved()
         );
     }
 
@@ -22,8 +23,9 @@ public class InventoryMapper {
                 inventory.getId(),
                 inventory.getProduct().getId(),
                 productName,
-                inventory.getQuantity(),
-                inventory.getReservedQuantity()
+                inventory.getAtStock(),
+                inventory.getAvailable(),
+                inventory.getReserved()
         );
     }
 }

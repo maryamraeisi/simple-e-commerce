@@ -19,7 +19,7 @@
     font-weight: 600;
 }
 
-.quantity {
+.at-stock {
     font-weight: 600;
 }
 
@@ -61,7 +61,7 @@
 
 
 /* =========================
-   Operations
+   Stock operation
    ========================= */
 
 .operation-section {
@@ -95,6 +95,26 @@
 .operation-buttons {
     display: flex;
     gap: 12px;
+}
+
+
+/* =========================
+   Inline stock update
+   ========================= */
+
+.stock-action {
+    display: flex;
+    align-items: center;
+}
+
+.stock-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stock-input input {
+    width: 120px;
 }
 
 
@@ -143,5 +163,14 @@
 
     .table-container {
         overflow-x: auto;
+    }
+
+    .stock-input {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .stock-input input {
+        width: 100%;
     }
 }

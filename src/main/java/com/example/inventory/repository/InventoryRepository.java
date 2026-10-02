@@ -1,7 +1,9 @@
 package com.example.inventory.repository;
 
 import com.example.inventory.entity.Inventory;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -13,4 +15,12 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     @Query("SELECT i FROM Inventory i JOIN FETCH i.product")
     List<Inventory> findAllWithProduct();
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select i from Inventory i
+            join fetch i.product
+            where i.product.id = :productId
+            """)
+    Optional<Inventory> findByProductIdForUpdate(Long productId);
 }

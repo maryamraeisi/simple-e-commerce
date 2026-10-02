@@ -7,7 +7,7 @@
     <title>Inventory</title>
 
     <link rel="stylesheet" href="/common/common.css">
-    <link rel="stylesheet" href="/inventory/inventory.css">
+    <link rel="stylesheet" href="/inventory/admin/inventory.css">
 </head>
 
 <body>
@@ -21,87 +21,111 @@
 
     <!-- Page header -->
     <div class="inventory-page-header">
+
         <div class="page-title">
             <h2>Inventory</h2>
             <p>View and manage your product stock.</p>
         </div>
+
         <div class="actions">
             <a class="btn btn-secondary" href="/index.html">
                 ← Back
             </a>
         </div>
+
     </div>
 
+
     <!-- Message -->
-    <div id="message" class="message" style="display: none;">
+    <div id="message"
+         class="message"
+         style="display: none;">
     </div>
+
 
     <!-- Search -->
     <div class="search-container">
-        <label for="inventorySearch">Search products</label>
-        <input type="search" id="inventorySearch" placeholder="Search by product name..." autocomplete="off">
+
+        <label for="inventorySearch">
+            Search products
+        </label>
+
+        <input
+                type="search"
+                id="inventorySearch"
+                placeholder="Search by product name..."
+                autocomplete="off">
+
     </div>
+
 
     <!-- Inventory table -->
     <div class="table-container">
+
         <table>
+
             <thead>
+
             <tr>
                 <th>Product</th>
-                <th>Total Quantity</th>
+                <th>At Stock</th>
                 <th>Reserved</th>
                 <th>Available</th>
                 <th>Actions</th>
             </tr>
+
             </thead>
+
             <tbody id="inventoryTableBody">
             </tbody>
+
         </table>
+
     </div>
+
 
     <!-- Empty state -->
-    <div id="emptyState" class="empty-state" style="display: none;">
+    <div
+            id="emptyState"
+            class="empty-state"
+            style="display: none;">
+
         <h3>No inventory found</h3>
-        <p>No products match your search.</p>
+
+        <p>
+            No products match your search.
+        </p>
+
     </div>
 
-    <!-- Reserve / Release section -->
+
+    <!-- Stock update explanation -->
     <section class="operation-section">
+
         <div class="section-header">
-            <div>
-                <h2>Order Inventory Operations</h2>
-                <p>Reserve or release inventory for an order.</p>
-            </div>
+
+            <h2>Update Stock</h2>
+
+            <p>
+                Increase or decrease the physical stock of a product.
+                Use a positive number to add stock and a negative number
+                to remove stock.
+            </p>
+
         </div>
-
-        <form id="orderOperationForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="orderId">Order ID</label>
-                    <input type="number" id="orderId" min="1" required placeholder="Enter order ID">
-                </div>
-            </div>
-
-            <div class="operation-buttons">
-                <button type="button" id="reserveButton" class="btn btn-primary">
-                    Reserve Stock
-                </button>
-                <button type="button" id="releaseButton" class="btn btn-secondary">
-                    Release Stock
-                </button>
-            </div>
-        </form>
 
     </section>
 
 </main>
 
+
 <footer class="footer">
     Simple E-Commerce &copy; 2026
 </footer>
 
+
 <script src="/common/common.js"></script>
-<script src="/inventory/inventory.js"></script>
+<script src="/inventory/admin/inventory.js"></script>
 
 </body>
 </html>
