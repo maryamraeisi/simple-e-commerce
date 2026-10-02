@@ -35,9 +35,9 @@ public class ProductService {
     }
 
     public ProductResponse getById(Long id) {
-        Product product = repository.findById(id).orElseThrow(() ->
+        Product product = repository.findByIdWithInventory(id).orElseThrow(() ->
                 new IllegalArgumentException("Product not found: " + id));
-        return ProductMapper.toResponse(product);
+        return ProductMapper.toResponseWithAvailability(product);
     }
 
     public Product getProductById(Long id) {
@@ -46,9 +46,9 @@ public class ProductService {
     }
 
     public List<ProductResponse> getAll() {
-        return repository.findAll()
+        return repository.findAllWithInventory()
                 .stream()
-                .map(ProductMapper::toResponse)
+                .map(ProductMapper::toResponseWithAvailability)
                 .toList();
     }
 

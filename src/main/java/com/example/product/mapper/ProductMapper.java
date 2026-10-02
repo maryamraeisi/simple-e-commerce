@@ -8,14 +8,26 @@ public class ProductMapper {
     private ProductMapper() {}
 
     public static ProductResponse toResponse(Product product) {
-
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
                 product.getImageUrl(),
-                product.isActive()
+                product.isActive(),
+                null
+        );
+    }
+
+    public static ProductResponse toResponseWithAvailability(Product product) {
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getImageUrl(),
+                product.isActive(),
+                product.getInventory().getAvailable()
         );
     }
 }

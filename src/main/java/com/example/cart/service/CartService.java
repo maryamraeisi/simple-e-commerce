@@ -8,6 +8,7 @@ import com.example.cart.repository.CartItemRepository;
 import com.example.cart.repository.CartRepository;
 import com.example.customer.entity.Customer;
 import com.example.infrastructure.security.UserContext;
+import com.example.inventory.service.InventoryService;
 import com.example.product.entity.Product;
 import com.example.product.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public class CartService {
     private final UserContext userContext;
     private final ProductService productService;
     private final GuestCartService guestCartService;
+    private final InventoryService inventoryService;
 
     public CartResponse addToCart(AddToCartRequest addToCartRequest,
                                   HttpServletRequest httpRequest,
@@ -39,8 +41,9 @@ public class CartService {
 
         Optional<CartItem> cartItemOptional = findCartItemByProductId(currentCart, addToCartRequest.productId());
         if (cartItemOptional.isPresent()) {
-            updateCartItemQuantity(currentCart, addToCartRequest);
+            updateCartItemQuantity(cartItemOptional.get(), addToCartRequest.productId(), addToCartRequest.quantity());
         } else {
+            validateAvailableStock(product.getId(), addToCartRequest.quantity());
             createCartItem(addToCartRequest.quantity(), currentCart, product);
         }
         cartRepository.save(currentCart);
@@ -52,6 +55,7 @@ public class CartService {
                                    HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         Cart currentCart = getCurrentCart(httpRequest, httpResponse);
         CartItem cartItem = findCartItemById(currentCart, itemId);
+        validateAvailableStock(cartItem.getProduct().getId(), request.quantity());
         cartItem.setQuantity(request.quantity());
         cartItemRepository.save(cartItem);
     }
@@ -113,8 +117,9 @@ public class CartService {
             Optional<CartItem> customerItem = findCartItemByProductId(customerCart, guestItem.getProduct().getId());
 
             if (customerItem.isPresent()) {
-                customerItem.get().setQuantity(customerItem.get().getQuantity() + guestItem.getQuantity());
+                updateCartItemQuantity(customerItem.get(), guestItem.getProduct().getId(), guestItem.getQuantity());
             } else {
+                validateAvailableStock(guestItem.getProduct().getId(), guestItem.getQuantity());
                 createCartItem(guestItem.getQuantity(), customerCart, guestItem.getProduct());
             }
         }
@@ -124,14 +129,18 @@ public class CartService {
     }
 
     private void assignGuestCartToCustomer(Cart guestCart, Customer customer) {
+        for (CartItem cartItem : guestCart.getCartItems()) {
+            validateAvailableStock(cartItem.getProduct().getId(), cartItem.getQuantity());
+        }
         guestCart.setCustomer(customer);
         guestCart.setGuestToken(null);
         cartRepository.save(guestCart);
     }
 
-    private void updateCartItemQuantity(Cart cart, AddToCartRequest request) {
-        CartItem cartItem = findCartItemByProductId(cart, request.productId()).get();
-        cartItem.setQuantity(cartItem.getQuantity() + request.quantity());
+    private void updateCartItemQuantity(CartItem cartItem, Long productId, Integer quantity) {
+        int newQuantity = cartItem.getQuantity() + quantity;
+        validateAvailableStock(productId, newQuantity);
+        cartItem.setQuantity(newQuantity);
     }
 
     private void createCartItem(int quantity, Cart cart, Product product) {
@@ -162,6 +171,21 @@ public class CartService {
     private void validateProduct(Product product) {
         if (!product.isActive()) {
             throw new IllegalStateException("Product is not available.");
+        }
+    }
+
+    private void validateAvailableStock(Long productId, int requestedQuantity) {
+        if (requestedQuantity <= 0) {
+            throw new IllegalArgumentException("Cart item quantity must be greater than zero.");
+        }
+
+        int available = inventoryService.getByProductId(productId).available();
+        if (available <= 0) {
+            throw new IllegalStateException("Product is out of stock.");
+        }
+
+        if (requestedQuantity > available) {
+            throw new IllegalStateException("Only " + available + " item(s) available.");
         }
     }
 

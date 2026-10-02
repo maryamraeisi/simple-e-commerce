@@ -5,6 +5,7 @@ body {
 }
 
 /* ========================= Header ========================= */
+
 .store-header {
     min-height: 72px;
     padding: 0 48px;
@@ -38,12 +39,12 @@ body {
     transition: color 0.2s ease;
 }
 
-.main-nav a:hover {
+.main-nav a:hover,
+.main-nav a.active {
     color: #2563eb;
 }
 
 .main-nav a.active {
-    color: #2563eb;
     font-weight: 600;
 }
 
@@ -63,7 +64,8 @@ body {
     color: #374151;
 }
 
-.login-button, .logout-button {
+.login-button,
+.logout-button {
     border-radius: 8px;
     padding: 9px 18px;
     font-size: 0.9rem;
@@ -95,12 +97,14 @@ body {
 }
 
 /* ========================= Main ========================= */
+
 .storefront-container {
     width: min(1200px, calc(100% - 48px));
     margin: 0 auto;
 }
 
 /* ========================= Hero ========================= */
+
 .hero {
     padding: 70px 0 45px;
 }
@@ -130,6 +134,7 @@ body {
 }
 
 /* ========================= Products ========================= */
+
 .products-section {
     padding-bottom: 70px;
 }
@@ -145,6 +150,7 @@ body {
 }
 
 /* ========================= Product Grid ========================= */
+
 .products-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -152,6 +158,7 @@ body {
 }
 
 /* ========================= Product Card ========================= */
+
 .product-card {
     overflow: hidden;
     display: flex;
@@ -216,6 +223,24 @@ body {
     overflow: hidden;
 }
 
+/* ========================= Product Stock ========================= */
+
+.product-stock {
+    margin-bottom: 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.product-stock.in-stock {
+    color: #218c53;
+}
+
+.product-stock.out-of-stock {
+    color: #b42318;
+}
+
+/* ========================= Product Footer ========================= */
+
 .product-footer {
     display: flex;
     align-items: center;
@@ -250,6 +275,7 @@ body {
 }
 
 /* ========================= Loading / Empty / Error ========================= */
+
 .loading {
     padding: 50px 20px;
     color: #6b7280;
@@ -288,6 +314,7 @@ body {
 }
 
 /* ========================= Responsive ========================= */
+
 @media (max-width: 900px) {
     .store-header {
         padding: 0 24px;
