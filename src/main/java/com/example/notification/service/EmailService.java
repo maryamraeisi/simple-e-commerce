@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     public void sendEmail(String recipient, String subject, String message) {
-        log.info("Sending email...");
+        log.info("Sending username...");
         log.info("To: {}", recipient);
         log.info("Subject: {}", subject);
         log.info("Message: {}", message);
 
-        // Later replace this with JavaMailSender or another email provider.
+        // Later replace this with JavaMailSender or another username provider.
     }
 }

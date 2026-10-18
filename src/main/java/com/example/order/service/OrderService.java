@@ -5,7 +5,7 @@ import com.example.customer.entity.Customer;
 import com.example.customer.service.CustomerService;
 import com.example.infrastructure.messaging.constants.RabbitMQExchange;
 import com.example.infrastructure.messaging.constants.RabbitMQRoutingKey;
-import com.example.infrastructure.security.UserContext;
+import com.example.infrastructure.security.service.UserContext;
 import com.example.order.event.OrderCreatedEvent;
 import com.example.order.mapper.OrderMapper;
 import com.example.order.repository.OrderRepository;
@@ -34,8 +34,7 @@ public class OrderService {
     private final CustomerService customerService;
 
     public OrderResponse createOrder() {
-        Long customerId = userContext.getCurrentUserId();
-        Customer customer = customerService.getCustomerById(customerId);
+        Customer customer = getCurrentCustomer();
 
         List<CartItem> cartItems = customer.getCart().getCartItems();
 
@@ -59,12 +58,12 @@ public class OrderService {
         return OrderMapper.toResponse(order);
     }
 
-    public OrderResponse getOrder(Long id) {
-        Long customerId = userContext.getCurrentUserId();
+    public OrderResponse getCustomerOrder(Long id) {
+        Customer customer = getCurrentCustomer();
 
         return orderRepository
                 .findById(id)
-                .filter(order -> order.getCustomer().getId().equals(customerId))
+                .filter(order -> order.getCustomer().getId().equals(customer.getId()))
                 .map(OrderMapper::toResponse)
                 .orElseThrow(() -> new IllegalArgumentException("You do not have an order with id: " + id));
     }
@@ -74,16 +73,21 @@ public class OrderService {
     }
 
     public List<OrderResponse> getCurrentCustomerOrders() {
-        Long customerId = userContext.getCurrentUserId();
+        Customer customer = getCurrentCustomer();
 
         return orderRepository
-                .findByCustomerId(customerId)
+                .findByCustomerId(customer.getId())
                 .stream()
                 .map(OrderMapper::toResponse)
                 .toList();
     }
 
-    public List<OrderResponse> getAllOrders() {
+    public OrderResponse getById(Long id) {
+        Order order = getOrderById(id);
+        return OrderMapper.toResponse(order);
+    }
+
+    public List<OrderResponse> getAll() {
         return orderRepository
                 .findAll()
                 .stream()
@@ -92,10 +96,10 @@ public class OrderService {
     }
 
     public void cancelOrder(Long id) {
-        Long customerId = userContext.getCurrentUserId();
+        Customer customer = getCurrentCustomer();
 
         Order order = orderRepository.findById(id)
-                .filter(o -> o.getCustomer().getId().equals(customerId))
+                .filter(o -> o.getCustomer().getId().equals(customer.getId()))
                 .orElseThrow(() -> new IllegalArgumentException("You do not have an order with id: " + id));
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -128,6 +132,10 @@ public class OrderService {
                 .totalPrice(total)
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+
+    private Customer getCurrentCustomer() {
+        return customerService.getCustomerByUserId(userContext.getCurrentUserId());
     }
 
     private void sendOrderCreatedNotification(Order order, Customer customer) {

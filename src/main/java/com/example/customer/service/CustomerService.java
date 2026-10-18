@@ -7,36 +7,35 @@ import com.example.customer.dto.UpdateCustomerRequest;
 import com.example.customer.entity.Customer;
 import com.example.customer.mapper.CustomerMapper;
 import com.example.customer.repository.CustomerRepository;
+import com.example.infrastructure.security.entity.AppUser;
+import com.example.infrastructure.security.entity.Role;
+import com.example.infrastructure.security.service.AppUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
 
     private final CustomerRepository repository;
-    private final PasswordEncoder passwordEncoder;
+    private final AppUserService appUserService;
 
+    @Transactional
     public CustomerResponse create(CreateCustomerRequest request) {
         if (repository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already exists.");
         }
 
+        AppUser user = appUserService.createNewUser(request.email(), request.password(), Set.of(Role.CUSTOMER));
+
         Cart cart = new Cart();
 
-        Customer customer = Customer.builder()
-                        .firstName(request.firstName())
-                        .lastName(request.lastName())
-                        .email(request.email())
-                        .password(passwordEncoder.encode(request.password()))
-                        .phoneNumber(request.phoneNumber())
-                        .cart(cart)
-                        .createdAt(LocalDateTime.now())
-                        .build();
+        Customer customer = createNewCustomer(request, cart, user);
 
         cart.setCustomer(customer);
 
@@ -48,11 +47,6 @@ public class CustomerService {
     public CustomerResponse getById(Long id) {
         Customer customer = repository.findById(id).orElseThrow();
         return CustomerMapper.toResponse(customer);
-    }
-
-    public Customer getCustomerById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
     }
 
     public List<CustomerResponse> getAll() {
@@ -74,9 +68,26 @@ public class CustomerService {
         return CustomerMapper.toResponse(customer);
     }
 
-    public void delete(Long id) {
+    public void activation(Long id, Boolean activated) {
         Customer customer = repository.findById(id).orElseThrow();
 
         repository.delete(customer);
+    }
+
+    public Customer getCustomerByUserId(Long userId) {
+        return repository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+    }
+
+    private Customer createNewCustomer(CreateCustomerRequest request, Cart cart, AppUser user) {
+        return Customer.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .email(request.email())
+                .phoneNumber(request.phoneNumber())
+                .cart(cart)
+                .createdAt(LocalDateTime.now())
+                .user(user)
+                .build();
     }
 }

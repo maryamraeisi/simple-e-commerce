@@ -1,12 +1,12 @@
-package com.example.infrastructure.security;
+package com.example.infrastructure.security.service;
 
 import com.example.cart.service.CartService;
 import com.example.customer.dto.CreateCustomerRequest;
 import com.example.customer.dto.CustomerResponse;
-import com.example.customer.entity.Customer;
-import com.example.customer.mapper.CustomerMapper;
 import com.example.customer.service.CustomerService;
 import com.example.infrastructure.security.dto.LoginRequest;
+import com.example.infrastructure.security.dto.AppUserResponse;
+import com.example.infrastructure.security.entity.AppUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class AuthService {
                                     HttpServletResponse httpResponse) {
 
         UsernamePasswordAuthenticationToken unauthenticated = UsernamePasswordAuthenticationToken
-                .unauthenticated(loginRequest.email(), loginRequest.password());
+                .unauthenticated(loginRequest.username(), loginRequest.password());
         Authentication authentication = authenticationManager.authenticate(unauthenticated);
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -54,8 +54,8 @@ public class AuthService {
         return customerService.create(request);
     }
 
-    public CustomerResponse getCurrentUser() {
-        Customer currentUser = userContext.getCurrentUser();
-        return CustomerMapper.toResponse(currentUser);
+    public AppUserResponse getCurrentUser() {
+        AppUser appUser = userContext.getCurrentUser();
+        return new AppUserResponse(appUser.getUsername(), appUser.getRoles());
     }
 }

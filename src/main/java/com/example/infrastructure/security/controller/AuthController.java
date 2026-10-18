@@ -1,8 +1,10 @@
-package com.example.infrastructure.security;
+package com.example.infrastructure.security.controller;
 
 import com.example.customer.dto.CreateCustomerRequest;
 import com.example.customer.dto.CustomerResponse;
+import com.example.infrastructure.security.dto.AppUserResponse;
 import com.example.infrastructure.security.dto.LoginRequest;
+import com.example.infrastructure.security.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -30,7 +32,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<CustomerResponse> me() {
+    public ResponseEntity<AppUserResponse> me() {
         return ResponseEntity.ok(authService.getCurrentUser());
     }
 

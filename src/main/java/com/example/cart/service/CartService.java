@@ -7,7 +7,8 @@ import com.example.cart.mapper.CartMapper;
 import com.example.cart.repository.CartItemRepository;
 import com.example.cart.repository.CartRepository;
 import com.example.customer.entity.Customer;
-import com.example.infrastructure.security.UserContext;
+import com.example.customer.service.CustomerService;
+import com.example.infrastructure.security.service.UserContext;
 import com.example.inventory.service.InventoryService;
 import com.example.product.entity.Product;
 import com.example.product.service.ProductService;
@@ -30,6 +31,7 @@ public class CartService {
     private final ProductService productService;
     private final GuestCartService guestCartService;
     private final InventoryService inventoryService;
+    private final CustomerService customerService;
 
     public CartResponse addToCart(AddToCartRequest addToCartRequest,
                                   HttpServletRequest httpRequest,
@@ -102,7 +104,7 @@ public class CartService {
         }
 
         Cart guestCart = guestCartOptional.get();
-        Customer customer = userContext.getCurrentUser();
+        Customer customer = customerService.getCustomerByUserId(userContext.getCurrentUserId());
         Optional<Cart> customerCartOptional = cartRepository.findByCustomerId(customer.getId());
         if (customerCartOptional.isEmpty()) {
             assignGuestCartToCustomer(guestCart, customer);
@@ -199,12 +201,11 @@ public class CartService {
     }
 
     private Cart getCustomerCart() {
-        Customer customer = userContext.getCurrentUser();
+        Long userId = userContext.getCurrentUserId();
+        Customer customer = customerService.getCustomerByUserId(userId);
 
-        Cart cart = cartRepository.findByCustomerId(customer.getId())
+        return cartRepository.findByCustomerId(customer.getId())
                 .orElseGet(() -> createNewCartForCustomer(customer));
-
-        return cart;
     }
 
     private Cart getCurrentCart(HttpServletRequest request, HttpServletResponse response) {

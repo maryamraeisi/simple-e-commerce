@@ -1,7 +1,7 @@
-package com.example.infrastructure.security;
+package com.example.infrastructure.security.service;
 
-import com.example.customer.entity.Customer;
-import com.example.customer.repository.CustomerRepository;
+import com.example.infrastructure.security.repository.AppUserRepository;
+import com.example.infrastructure.security.entity.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AppUserDetailsService implements UserDetailsService {
 
-    private final CustomerRepository customerRepository;
+    private final AppUserRepository appUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Customer customer = customerRepository.findByEmail(username)
+        AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
-        return new AppUserDetails(customer);
+        return new AppUserDetails(user);
     }
 }

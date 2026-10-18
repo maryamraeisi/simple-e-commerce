@@ -1,5 +1,6 @@
-package com.example.infrastructure.security;
+package com.example.infrastructure.security.config;
 
+import com.example.infrastructure.security.service.AppUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,6 +22,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -55,10 +58,12 @@ public class SecurityConfig {
                         // Authentication
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
-                        .requestMatchers("/api/auth/me").authenticated()
+
+                        // Public URLs
                         .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers("/mock-ipg/**").permitAll()
                         .requestMatchers("/api/payments/callback").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
                         // Public frontend
                         .requestMatchers(
@@ -75,7 +80,6 @@ public class SecurityConfig {
                                 "/cart/**",
                                 "/payment/storefront/mock-ipg/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .anyRequest()
                         .authenticated())
                 .exceptionHandling(exceptions -> exceptions
