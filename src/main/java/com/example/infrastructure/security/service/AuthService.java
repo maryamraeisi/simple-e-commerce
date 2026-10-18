@@ -3,10 +3,12 @@ package com.example.infrastructure.security.service;
 import com.example.cart.service.CartService;
 import com.example.customer.dto.CreateCustomerRequest;
 import com.example.customer.dto.CustomerResponse;
+import com.example.customer.entity.Customer;
 import com.example.customer.service.CustomerService;
 import com.example.infrastructure.security.dto.LoginRequest;
 import com.example.infrastructure.security.dto.AppUserResponse;
 import com.example.infrastructure.security.entity.AppUser;
+import com.example.infrastructure.security.entity.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +58,15 @@ public class AuthService {
 
     public AppUserResponse getCurrentUser() {
         AppUser appUser = userContext.getCurrentUser();
-        return new AppUserResponse(appUser.getUsername(), appUser.getRoles());
+        String firstName = null;
+        String lastName = null;
+
+        if (appUser.getRoles().contains(Role.CUSTOMER)) {
+            Customer customer = customerService.getCustomerByUserId(appUser.getId());
+            firstName = customer.getFirstName();
+            lastName = customer.getLastName();
+        }
+
+        return new AppUserResponse(appUser.getUsername(), appUser.getRoles(), firstName, lastName);
     }
 }

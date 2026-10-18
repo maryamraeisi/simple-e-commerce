@@ -33,7 +33,7 @@ function showLoggedIn(customer) {
         return;
     }
 
-    customerName.textContent = `${customer.firstName} ${customer.lastName}`;
+    customerName.textContent = [customer.firstName, customer.lastName].filter(Boolean).join(" ") || customer.username;
 
     loggedOut.hidden = true;
     loggedIn.hidden = false;

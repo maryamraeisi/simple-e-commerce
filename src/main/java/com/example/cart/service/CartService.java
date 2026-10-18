@@ -65,9 +65,14 @@ public class CartService {
     public void deleteItem(Long itemId, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         Cart currentCart = getCurrentCart(httpRequest, httpResponse);
         CartItem cartItem = findCartItemById(currentCart, itemId);
-        cartItemRepository.delete(cartItem);
+
+        currentCart.getCartItems().remove(cartItem);
+        cartItem.setCart(null);
+
+        cartRepository.save(currentCart);
     }
 
+    @Transactional
     public void deleteAllItems(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         Cart currentCart = getCurrentCart(httpRequest, httpResponse);
         currentCart.getCartItems().clear();

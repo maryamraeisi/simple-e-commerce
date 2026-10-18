@@ -6,6 +6,8 @@ import java.util.Set;
 
 public record AppUserResponse(
         String username,
-        Set<Role> role
+        Set<Role> role,
+        String firstName,
+        String lastName
 ) {
 }
