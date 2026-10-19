@@ -1,40 +1,188 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Products</title>
-
-    <link rel="stylesheet" href="/products/admin/product.css">
+    <title>Products | Simple Shop Admin</title>
+    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="stylesheet" href="/products/admin/products.css">
 </head>
-
 <body>
+<div class="admin-shell">
+    <aside class="sidebar" id="sidebar">
+        <a href="/admin/index.html" class="brand">
+            <span class="brand-mark">S</span>
+            <span class="brand-copy">
+                <strong>Simple Shop</strong>
+                <small>Administration</small>
+            </span>
+        </a>
 
-<div class="container">
+        <div class="nav-label">MAIN MENU</div>
 
-    <div class="page-header">
+        <nav class="side-nav" aria-label="Admin navigation">
+            <a href="/admin/index.html" class="nav-link">
+                <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/products/admin/products.html" class="nav-link active" aria-current="page">
+                <span class="nav-icon"><i data-lucide="package"></i></span>
+                <span>Products</span>
+            </a>
+            <a href="/inventory/admin/inventory.html" class="nav-link">
+                <span class="nav-icon"><i data-lucide="warehouse"></i></span>
+                <span>Inventory</span>
+            </a>
+            <a href="/orders/admin/orders.html" class="nav-link">
+                <span class="nav-icon"><i data-lucide="shopping-bag"></i></span>
+                <span>Orders</span>
+            </a>
+            <a href="/payment/admin/payments.html" class="nav-link">
+                <span class="nav-icon"><i data-lucide="credit-card"></i></span>
+                <span>Payments</span>
+            </a>
+            <a href="/customers/admin/customers.html" class="nav-link">
+                <span class="nav-icon"><i data-lucide="users"></i></span>
+                <span>Customers</span>
+            </a>
+        </nav>
 
-        <div>
-            <h1>Products</h1>
-            <p>Manage your products</p>
+        <div class="sidebar-bottom">
+            <div class="sidebar-note">
+                <span class="note-icon"><i data-lucide="shield-check"></i></span>
+                <div>
+                    <strong>Admin workspace</strong>
+                    <p>Manage your store from one place.</p>
+                </div>
+            </div>
+
+            <a href="/index.html" class="nav-link storefront-link">
+                <span class="nav-icon"><i data-lucide="store"></i></span>
+                <span>View storefront</span>
+                <span class="quick-arrow"><i data-lucide="external-link"></i></span>
+            </a>
         </div>
-        <div class="actions">
-            <a class="btn btn-primary" href="/products/admin/product-form.html">+ Add Product</a>
-            <a href="/index.html" class="btn btn-secondary">← Back</a>
-        </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <div class="main-column">
+        <header class="topbar">
+            <button type="button"
+                    class="menu-toggle"
+                    id="menu-toggle"
+                    aria-label="Open navigation menu"
+                    aria-controls="sidebar"
+                    aria-expanded="false">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="breadcrumb">
+                <a href="/admin/index.html">Admin</a>
+                <span class="breadcrumb-separator">/</span>
+                <strong>Products</strong>
+            </div>
+
+            <div class="topbar-actions">
+                <div class="admin-status">
+                    <span class="status-dot"></span>
+                    <span>Admin workspace</span>
+                </div>
+
+                <div class="user-menu">
+                    <div class="avatar" id="admin-avatar">A</div>
+                    <div class="user-copy">
+                        <span class="user-name" id="admin-name">Administrator</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                    <button type="button" class="logout-button" id="logout-button">
+                        <i data-lucide="log-out"></i>
+                        <span>Log out</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="content product-page">
+            <section class="welcome-row">
+                <div>
+                    <p class="eyebrow">STORE MANAGEMENT</p>
+                    <h1>Products</h1>
+                    <p class="page-subtitle">
+                        Create, update, and manage your product listings.
+                    </p>
+                </div>
+
+                <a class="primary-button" href="/products/admin/product-form.html">
+                    <i data-lucide="plus"></i>
+                    <span>Add product</span>
+                </a>
+            </section>
+
+            <div id="message" aria-live="polite"></div>
+
+
+            <section class="section-block">
+                <div class="section-heading product-section-heading">
+                    <div>
+                        <h2>All products</h2>
+                        <p id="product-count">Loading products...</p>
+                    </div>
+                </div>
+
+                <div class="products-toolbar">
+                    <div class="products-search">
+                        <i data-lucide="search"></i>
+                        <input
+                                type="search"
+                                id="product-search"
+                                placeholder="Search products..."
+                                aria-label="Search products by name"
+                        >
+                    </div>
+
+                    <button type="button" class="refresh-button" id="refresh-products">
+                        <i data-lucide="refresh-cw"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+
+                <div class="products-table-container" aria-live="polite">
+                    <table class="products-table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="product-table-body">
+                        <tr>
+                            <td colspan="5" class="table-message">Loading products...</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <span>Simple Shop Admin</span>
+                <span>Product management</span>
+            </footer>
+        </main>
     </div>
-
-    <div id="message"></div>
-
-    <div id="product-grid" class="product-grid">
-        <!-- Products will be rendered here -->
-    </div>
-
 </div>
 
-<script src="/products/products.js"></script>
-
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="/admin/admin.js"></script>
+<script src="/products/admin/products.js"></script>
+<script>
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+</script>
 </body>
 </html>

@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f9fc">
+    <title>Admin Dashboard | Simple Shop</title>
+
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <a href="/admin/index.html" class="brand">
+            <span class="brand-mark">S</span>
+            <span class="brand-copy">
+                <strong>Simple Shop</strong>
+                <small>Administration</small>
+            </span>
+        </a>
+
+        <div class="nav-label">MAIN MENU</div>
+
+        <nav class="side-nav" aria-label="Admin navigation">
+            <a href="/admin/index.html" class="nav-link active" aria-current="page">
+                <span class="nav-icon">
+                    <i data-lucide="layout-dashboard"></i>
+                </span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/products/admin/products.html" class="nav-link">
+                <span class="nav-icon">
+                    <i data-lucide="package"></i>
+                </span>
+                <span>Products</span>
+            </a>
+
+            <a href="/inventory/admin/inventory.html" class="nav-link">
+                <span class="nav-icon">
+                    <i data-lucide="warehouse"></i>
+                </span>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/orders/admin/orders.html" class="nav-link">
+                <span class="nav-icon">
+                    <i data-lucide="shopping-bag"></i>
+                </span>
+                <span>Orders</span>
+            </a>
+
+            <a href="/payment/admin/payments.html" class="nav-link">
+                <span class="nav-icon">
+                    <i data-lucide="credit-card"></i>
+                </span>
+                <span>Payments</span>
+            </a>
+
+            <a href="/customers/admin/customers.html" class="nav-link">
+                <span class="nav-icon">
+                    <i data-lucide="users"></i>
+                </span>
+                <span>Customers</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-note">
+                <span class="note-icon">
+                    <i data-lucide="shield-check"></i>
+                </span>
+                <div>
+                    <strong>Admin workspace</strong>
+                    <p>Manage your store from one place.</p>
+                </div>
+            </div>
+
+            <a href="/index.html" class="nav-link storefront-link">
+                <span class="nav-icon">
+                    <i data-lucide="store"></i>
+                </span>
+                <span>View storefront</span>
+                <span class="quick-arrow">
+                    <i data-lucide="external-link"></i>
+                </span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Main content -->
+    <div class="main-column">
+
+        <!-- Top bar -->
+        <header class="topbar">
+            <button
+                    type="button"
+                    class="menu-toggle"
+                    id="menu-toggle"
+                    aria-label="Open navigation menu"
+                    aria-controls="sidebar"
+                    aria-expanded="false">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="breadcrumb">
+                <span>Admin</span>
+                <span class="breadcrumb-separator">/</span>
+                <strong>Dashboard</strong>
+            </div>
+
+            <div class="topbar-actions">
+                <div class="admin-status">
+                    <span class="status-dot"></span>
+                    <span>Admin workspace</span>
+                </div>
+
+                <div class="user-menu">
+                    <div class="avatar" id="admin-avatar">A</div>
+
+                    <div class="user-copy">
+                        <span class="user-name" id="admin-name">Administrator</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+
+                    <button
+                            type="button"
+                            class="logout-button"
+                            id="logout-button">
+                        <i data-lucide="log-out"></i>
+                        <span>Log out</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard page -->
+        <main class="content">
+            <section class="welcome-row">
+                <div>
+                    <p class="eyebrow">OVERVIEW</p>
+                    <h1>Dashboard</h1>
+                    <p class="page-subtitle">
+                        Welcome back. What would you like to manage today?
+                    </p>
+                </div>
+
+                <a href="/products/admin/products.html" class="primary-button">
+                    <i data-lucide="plus"></i>
+                    <span>Add a product</span>
+                </a>
+            </section>
+
+            <!-- Authentication and action feedback -->
+            <div
+                    class="notice"
+                    id="notice"
+                    role="status"
+                    aria-live="polite"
+                    hidden>
+            </div>
+
+            <!-- Store management -->
+            <section class="section-block" aria-labelledby="management-heading">
+                <div class="section-heading">
+                    <div>
+                        <h2 id="management-heading">Store management</h2>
+                        <p>Access and manage the main areas of your store.</p>
+                    </div>
+                </div>
+
+                <div class="management-grid">
+
+                    <a href="/products/admin/products.html" class="management-card">
+                        <span class="card-icon icon-blue">
+                            <i data-lucide="package"></i>
+                        </span>
+                        <span class="card-title">Products</span>
+                        <span class="card-description">
+                            Add products, update details, manage prices and product availability.
+                        </span>
+                        <span class="card-link">
+                            Manage products
+                            <i data-lucide="arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="/inventory/admin/inventory.html" class="management-card">
+                        <span class="card-icon icon-violet">
+                            <i data-lucide="warehouse"></i>
+                        </span>
+                        <span class="card-title">Inventory</span>
+                        <span class="card-description">
+                            Review stock levels and keep track of available inventory.
+                        </span>
+                        <span class="card-link">
+                            Manage inventory
+                            <i data-lucide="arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="/orders/admin/orders.html" class="management-card">
+                        <span class="card-icon icon-cyan">
+                            <i data-lucide="shopping-bag"></i>
+                        </span>
+                        <span class="card-title">Orders</span>
+                        <span class="card-description">
+                            Review customer orders and check their current status.
+                        </span>
+                        <span class="card-link">
+                            View orders
+                            <i data-lucide="arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="/payment/admin/payments.html" class="management-card">
+                        <span class="card-icon icon-green">
+                            <i data-lucide="credit-card"></i>
+                        </span>
+                        <span class="card-title">Payments</span>
+                        <span class="card-description">
+                            Review payment records and check payment statuses.
+                        </span>
+                        <span class="card-link">
+                            View payments
+                            <i data-lucide="arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="/customers/admin/customers.html" class="management-card">
+                        <span class="card-icon icon-orange">
+                            <i data-lucide="users"></i>
+                        </span>
+                        <span class="card-title">Customers</span>
+                        <span class="card-description">
+                            View customer information and manage customer accounts.
+                        </span>
+                        <span class="card-link">
+                            View customers
+                            <i data-lucide="arrow-right"></i>
+                        </span>
+                    </a>
+
+                </div>
+            </section>
+
+            <!-- Quick actions -->
+            <section class="section-block" aria-labelledby="quick-actions-heading">
+                <div class="section-heading">
+                    <div>
+                        <h2 id="quick-actions-heading">Quick actions</h2>
+                        <p>Jump straight to a common task.</p>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+
+                    <a href="/products/admin/products.html" class="quick-action">
+                        <span class="quick-action-icon">
+                            <i data-lucide="plus-circle"></i>
+                        </span>
+                        <span>
+                            <strong>Add a product</strong>
+                            <small>Create or update your product listings</small>
+                        </span>
+                        <span class="quick-arrow">
+                            <i data-lucide="arrow-up-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="/inventory/admin/inventory.html" class="quick-action">
+                        <span class="quick-action-icon">
+                            <i data-lucide="boxes"></i>
+                        </span>
+                        <span>
+                            <strong>Check inventory</strong>
+                            <small>Review stock and product quantities</small>
+                        </span>
+                        <span class="quick-arrow">
+                            <i data-lucide="arrow-up-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="/orders/admin/orders.html" class="quick-action">
+                        <span class="quick-action-icon">
+                            <i data-lucide="clipboard-list"></i>
+                        </span>
+                        <span>
+                            <strong>Review orders</strong>
+                            <small>Check recent customer orders</small>
+                        </span>
+                        <span class="quick-arrow">
+                            <i data-lucide="arrow-up-right"></i>
+                        </span>
+                    </a>
+
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                <span>Simple Shop Admin</span>
+                <span>Store management dashboard</span>
+            </footer>
+        </main>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="/admin/admin.js"></script>
+<script>
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+</script>
+</body>
+</html>
